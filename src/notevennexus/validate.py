@@ -2,6 +2,7 @@
 # Copyright (c) 2023 Scipp contributors (https://github.com/scipp)
 from __future__ import annotations
 
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
 from .tree import Dataset, Group, unroll_tree
@@ -20,18 +21,20 @@ class Violation:
         )
 
 
-class Validator:
+class Validator(ABC):
     def __init__(self, name: str, description: str) -> None:
         self.name = name
         self.description = description
         self._count = 0
         self._violations: list[Violation] = []
 
+    @abstractmethod
     def applies_to(self, node: Dataset | Group) -> bool:
-        raise NotImplementedError
+        """Return True if this validator applies to the given node"""
 
+    @abstractmethod
     def validate(self, node: Dataset | Group) -> Violation | None:
-        raise NotImplementedError
+        """Return a Violation if the given node violates this validator"""
 
     def apply(self, node: Dataset | Group) -> None:
         if self.applies_to(node):

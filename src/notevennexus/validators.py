@@ -56,12 +56,12 @@ class legacy_nexus_class(Validator):
         super().__init__("legacy_NX_class", "Check if NX_class is deprecated")
 
     def applies_to(self, node: Dataset | Group) -> bool:
-        return isinstance(node, Group)
+        return isinstance(node, Group) and "NX_class" in node.attrs
 
     def validate(self, node: Dataset | Group) -> Violation | None:
-        if (nx_class := node.attrs.get("NX_class")) is not None:
-            if nx_class in ['NXgeometry', 'NXorientation', 'NXshape', 'NXtranslation']:
-                return Violation(node.name, f"NX_class {nx_class} is deprecated")
+        nx_class = node.attrs.get("NX_class")
+        if nx_class in ['NXgeometry', 'NXorientation', 'NXshape', 'NXtranslation']:
+            return Violation(node.name, f"NX_class {nx_class} is deprecated")
 
 
 class group_has_units(Validator):
@@ -94,7 +94,9 @@ class invalid_units(Validator):
 
 class index_has_units(Validator):
     def __init__(self) -> None:
-        super().__init__("index_has_units", "Index should not have units attribute")
+        super().__init__(
+            "index_has_units", "Index or mask should not have units attribute"
+        )
 
     def applies_to(self, node: Dataset | Group) -> bool:
         names = [
@@ -125,10 +127,10 @@ class float_dataset_has_no_units(Validator):
         )
 
     def applies_to(self, node: Dataset | Group) -> bool:
-        return isinstance(node, Dataset)
+        return isinstance(node, Dataset) and node.dtype in ['float32', 'float64']
 
     def validate(self, node: Dataset | Group) -> Violation | None:
-        if node.dtype in ['float32', 'float64'] and 'units' not in node.attrs:
+        if 'units' not in node.attrs:
             return Violation(node.name)
 
 
@@ -144,12 +146,15 @@ class offset_units_missing(Validator):
         )
 
     def applies_to(self, node: Dataset | Group) -> bool:
-        return isinstance(node, Dataset) and is_transformation(node)
+        return (
+            isinstance(node, Dataset)
+            and is_transformation(node)
+            and 'offset' in node.attrs
+        )
 
     def validate(self, node: Dataset | Group) -> Violation | None:
-        if 'offset' in node.attrs:
-            if 'offset_units' not in node.attrs:
-                return Violation(node.name)
+        if 'offset_units' not in node.attrs:
+            return Violation(node.name)
 
 
 class transformation_depends_on_missing(Validator):

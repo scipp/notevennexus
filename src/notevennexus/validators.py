@@ -85,7 +85,7 @@ class invalid_units(Validator):
 
     def validate(self, node: Dataset | Group) -> Violation | None:
         units = node.attrs['units']
-        if units.startswith('NX_'):
+        if units.startswith('NX_'):  # Placeholder from NeXus standard
             return Violation(node.name, f"Invalid units {units}")
         invalid = ['hz']
         if units in invalid:
@@ -166,6 +166,59 @@ class transformation_depends_on_missing(Validator):
             return Violation(node.name)
 
 
+physical_components = [
+    'NXaperture',
+    'NXattenuator',
+    'NXbeam',
+    'NXbeam_stop',
+    'NXbending_magnet',
+    'NXcapillary',
+    'NXcollimator',
+    'NXcrystal',
+    'NXdetector',
+    'NXdetector_module',
+    'NXdisk_chopper',
+    'NXfermi_chopper',
+    'NXfilter',
+    'NXflipper',
+    'NXfresnel_zone_plate',
+    'NXgrating',
+    'NXguide',
+    'NXinsertion_device',
+    'NXmirror',
+    'NXmoderator',
+    'NXmonitor',
+    'NXmonochromator',
+    'NXpinhole',
+    'NXpolarizer',
+    'NXpositioner',
+    'NXsample',
+    'NXsensor',
+    'NXslit',
+    'NXsource',
+    'NXvelocity_selector',
+    'NXxraylens',
+]
+
+
+class depends_on_missing(Validator):
+    def __init__(self) -> None:
+        super().__init__(
+            'depends_on_missing',
+            'Group describes a physical component but has no depends_on',
+        )
+
+    def applies_to(self, node: Dataset | Group) -> bool:
+        if isinstance(node, Group):
+            if node.attrs.get('NX_class') in physical_components:
+                return True
+        return False
+
+    def validate(self, node: Dataset | Group) -> Violation | None:
+        if 'depends_on' not in node.children:
+            return Violation(node.name)
+
+
 def base_validators():
     return [
         NX_class_attr_missing(),
@@ -177,4 +230,5 @@ def base_validators():
         float_dataset_has_no_units(),
         offset_units_missing(),
         transformation_depends_on_missing(),
+        depends_on_missing(),
     ]

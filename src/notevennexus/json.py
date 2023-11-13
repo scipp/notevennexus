@@ -8,9 +8,9 @@ from .tree import Dataset, Group
 
 def read_json(path: str) -> Group:
     """
-    Read JSON file and return tree of datasets and groups.
+    Read JSON NeXus file and return tree of datasets and groups.
 
-    The JSON looks like this:
+    The JSON looks something like this:
 
     {
         "name": "delay",
@@ -51,25 +51,26 @@ def read_json(path: str) -> Group:
     },
     """
     with open(path, "r") as f:
-        return _read_group(json.load(f), path=[])
+        return _read_group(json.load(f))
 
 
-def _read_group(group: dict[str, Any], path: list[str]) -> Group:
+def _read_group(group: dict[str, Any], parent: Group | None = None) -> Group:
     """Read JSON group"""
-    path = path + [group.get("name", '')]
-    name = '/'.join(path)
-    grp = Group(name=name, attrs={}, children={}, parent=None)
+    name = group.get("name", '')
+    if parent is not None:
+        name = parent.name + '/' + name
+    grp = Group(name=name, attrs={}, children={}, parent=parent)
     for child in group["children"]:
         if not isinstance(child, dict):
             continue
         module = child.get("module")
         if module is None:
             if child["type"] == "group":
-                grp.children[child["name"]] = _read_group(child, path=path)
+                grp.children[child["name"]] = _read_group(child, parent=grp)
         elif module == "dataset":
-            grp.children[child["config"]["name"]] = _read_dataset(child, path=path)
+            grp.children[child["config"]["name"]] = _read_dataset(child, parent=grp)
         elif module in ["f142", 'f144']:
-            grp.children[child["config"]["source"]] = _read_source(child, path=path)
+            grp.children[child["config"]["source"]] = _read_source(child, parent=grp)
         elif module in ['tdct', 'ev44']:
             # No useful info in these?
             pass
@@ -79,29 +80,27 @@ def _read_group(group: dict[str, Any], path: list[str]) -> Group:
     return grp
 
 
-def _read_dataset(dataset: dict[str, Any], path: list[str]) -> Dataset:
+def _read_dataset(dataset: dict[str, Any], parent: Group) -> Dataset:
     """Read JSON dataset"""
-    path = path + [dataset['config']["name"]]
-    name = '/'.join(path)
+    name = parent.name + '/' + dataset['config']["name"]
     return Dataset(
         name=name,
         shape=None,
         dtype=dataset["config"].get("type"),
         attrs=_read_attrs(dataset),
-        parent=None,
+        parent=parent,
     )
 
 
-def _read_source(source: dict[str, Any], path: list[str]) -> Dataset:
+def _read_source(source: dict[str, Any], parent: Group) -> Dataset:
     """Read JSON source"""
-    path = path + [source['config']["source"]]
-    name = '/'.join(path)
+    name = parent.name + '/' + source['config']["source"]
     ds = Dataset(
         name=name,
         shape=None,
         dtype=source["config"]["dtype"],
         attrs=_read_attrs(source),
-        parent=None,
+        parent=parent,
     )
     if (units := source["config"].get("value_units")) is not None:
         ds.attrs['units'] = units

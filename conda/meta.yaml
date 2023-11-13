@@ -1,0 +1,38 @@
+package:
+  name: notevennexus
+
+  version: {{ GIT_DESCRIBE_TAG }}
+
+source:
+  path: ..
+
+requirements:
+  build:
+    - setuptools
+    - setuptools_scm
+  run:
+    - python>=3.10
+
+test:
+  imports:
+    - notevennexus
+  requires:
+    - pytest
+  source_files:
+    - pyproject.toml
+    - tests/
+  commands:
+    - python -m pytest tests
+
+build:
+  noarch: python
+  script:
+    - pip install .
+
+about:
+  home: https://github.com/scipp/notevennexus
+  license: BSD-3-Clause
+  summary: Validate NeXus files
+  description: Validate NeXus files
+  dev_url: https://github.com/scipp/notevennexus
+  doc_url: https://scipp.github.io/notevennexus

@@ -7,7 +7,6 @@ min_python: '3.10'
 namespace_package: ''
 nightly_deps: ''
 orgname: scipp
-prettyname: NotEvenNexus
 projectname: notevennexus
 related_projects: ScippNexus
 year: 2023

@@ -49,7 +49,7 @@ class legacy_nexus_class(Validator):
         self, tree: dict[str, Dataset | Group], node: Dataset | Group
     ) -> Violation | None:
         if (nx_class := node.attrs.get("NX_class")) is not None:
-            if nx_class in ['NXgeometry', 'NXshape']:
+            if nx_class in ['NXgeometry', 'NXorientation', 'NXshape', 'NXtranslation']:
                 return Violation(node.name, f"NX_class {nx_class} is deprecated")
 
 

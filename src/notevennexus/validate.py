@@ -68,5 +68,6 @@ def report(validators: list[Validator]) -> str:
         for violation in v.violations:
             details += f"{v.name} @ {violation.format()}\n"
         summary += f"{v.name}: {len(v.violations)}/{v._count}\n"
+    summary += '\n'
     summary += f"Total: {total_violations}/{total_checks}"
     return f'{details}\n\n{summary}'

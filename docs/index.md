@@ -5,6 +5,21 @@
   </br></br>
 </span>
 
+## Install
+
+```bash
+pip install notevennexus
+```
+
+## Run
+
+```bash
+notevennexus <path-to-nexus-file>
+```
+
+This supports HDF5 as well as some JSON format.
+There is also a Python API, but this is under construction and unstable.
+
 ```{toctree}
 ---
 hidden:

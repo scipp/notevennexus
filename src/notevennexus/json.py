@@ -58,7 +58,6 @@ def _read_group(group: dict[str, Any], path: list[str]) -> Group:
     """Read JSON group"""
     path = path + [group.get("name", '')]
     name = '/'.join(path)
-    print(name)
     grp = Group(name=name, attrs={}, children={}, parent=None)
     for child in group["children"]:
         if not isinstance(child, dict):
@@ -86,7 +85,7 @@ def _read_dataset(dataset: dict[str, Any], path: list[str]) -> Dataset:
     name = '/'.join(path)
     return Dataset(
         name=name,
-        shape=(),
+        shape=None,
         dtype=dataset["config"].get("type"),
         attrs=_read_attrs(dataset),
         parent=None,
@@ -99,7 +98,7 @@ def _read_source(source: dict[str, Any], path: list[str]) -> Dataset:
     name = '/'.join(path)
     ds = Dataset(
         name=name,
-        shape=(),
+        shape=None,
         dtype=source["config"]["dtype"],
         attrs=_read_attrs(source),
         parent=None,

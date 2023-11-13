@@ -11,7 +11,7 @@ except importlib.metadata.PackageNotFoundError:
 
 del importlib
 
+from . import validators
 from .hdf5 import read_hdf5
 from .tree import Dataset, Group, unroll_tree
 from .validate import Validator, validate
-from . import validators

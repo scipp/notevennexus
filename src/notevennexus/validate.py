@@ -30,15 +30,13 @@ class Validator:
     def applies_to(self, node: Dataset | Group) -> bool:
         raise NotImplementedError
 
-    def validate(
-        self, tree: dict[str, Dataset | Group], node: Dataset | Group
-    ) -> Violation | None:
+    def validate(self, node: Dataset | Group) -> Violation | None:
         raise NotImplementedError
 
-    def apply(self, tree: dict[str, Dataset | Group], node: Dataset | Group) -> None:
+    def apply(self, node: Dataset | Group) -> None:
         if self.applies_to(node):
             self._count += 1
-            if (violation := self.validate(tree, node)) is not None:
+            if (violation := self.validate(node)) is not None:
                 self._violations.append(violation)
 
     @property
@@ -54,7 +52,7 @@ def validate(group: Group, validators: list[Validator]) -> None:
     tree = unroll_tree(group)
     for node in tree.values():
         for validator in validators:
-            validator.apply(tree, node)
+            validator.apply(node)
 
 
 def report(validators: list[Validator]) -> str:

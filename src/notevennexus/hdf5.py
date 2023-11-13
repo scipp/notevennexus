@@ -23,14 +23,14 @@ def _read_attrs(node: h5py.Dataset | h5py.Group) -> dict[str, Any]:
     return attrs
 
 
-def _read_group(group: h5py.File) -> Group:
+def _read_group(group: h5py.File, parent: Group | None = None) -> Group:
     """Read HDF5 group"""
-    grp = Group(name=group.name, attrs=_read_attrs(group), children={}, parent=None)
+    grp = Group(name=group.name, attrs=_read_attrs(group), children={}, parent=parent)
     for name, value in group.items():
         if isinstance(value, h5py.Dataset):
-            grp.children[name] = _read_dataset(value, group)
+            grp.children[name] = _read_dataset(value, parent=grp)
         elif isinstance(value, h5py.Group):
-            grp.children[name] = _read_group(value)
+            grp.children[name] = _read_group(value, parent=grp)
         else:
             raise ValueError(f"Unsupported type: {type(value)}")
     return grp

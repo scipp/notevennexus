@@ -11,9 +11,7 @@ class NX_class_attr_missing(Validator):
     def applies_to(self, node: Dataset | Group) -> bool:
         return isinstance(node, Group)
 
-    def validate(
-        self, tree: dict[str, Dataset | Group], node: Dataset | Group
-    ) -> Violation | None:
+    def validate(self, node: Dataset | Group) -> Violation | None:
         if "NX_class" not in node.attrs:
             return Violation(node.name)
 
@@ -25,17 +23,35 @@ class depends_on_target_missing(Validator):
     def applies_to(self, node: Dataset | Group) -> bool:
         return node.name.endswith('/depends_on') or "depends_on" in node.attrs
 
-    def validate(
-        self, tree: dict[str, Dataset | Group], node: Dataset | Group
-    ) -> Violation | None:
+    def validate(self, node: Dataset | Group) -> Violation | None:
         if node.name.endswith('/depends_on'):
             target = node.value
         else:
             target = node.attrs["depends_on"]
-        if target == '.':
-            return None
-        if target not in tree:
-            return Violation(node.name, f"depends_on target {target} is missing")
+        if target != '.':
+            if not isinstance(target, str):
+                return Violation(
+                    node.name, f"depends_on target {target} is not a string"
+                )
+            path = target.split('/')
+            if path[0] == '':
+                start = self._find_root(node)
+                path = path[1:]
+            else:
+                start = node.parent
+            if path[0] == '.':
+                path = path[1:]
+            for name in path:
+                if name not in start.children:
+                    return Violation(
+                        node.name, f"depends_on target {target} is missing"
+                    )
+                start = start.children[name]
+
+    def _find_root(self, node: Dataset | Group) -> Dataset | Group:
+        while node.parent is not None:
+            node = node.parent
+        return node
 
 
 class legacy_nexus_class(Validator):
@@ -45,9 +61,7 @@ class legacy_nexus_class(Validator):
     def applies_to(self, node: Dataset | Group) -> bool:
         return isinstance(node, Group)
 
-    def validate(
-        self, tree: dict[str, Dataset | Group], node: Dataset | Group
-    ) -> Violation | None:
+    def validate(self, node: Dataset | Group) -> Violation | None:
         if (nx_class := node.attrs.get("NX_class")) is not None:
             if nx_class in ['NXgeometry', 'NXorientation', 'NXshape', 'NXtranslation']:
                 return Violation(node.name, f"NX_class {nx_class} is deprecated")
@@ -60,9 +74,7 @@ class group_has_units(Validator):
     def applies_to(self, node: Dataset | Group) -> bool:
         return isinstance(node, Group)
 
-    def validate(
-        self, tree: dict[str, Dataset | Group], node: Dataset | Group
-    ) -> Violation | None:
+    def validate(self, node: Dataset | Group) -> Violation | None:
         if 'units' in node.attrs:
             return Violation(node.name)
 
@@ -74,9 +86,7 @@ class invalid_units(Validator):
     def applies_to(self, node: Dataset | Group) -> bool:
         return isinstance(node, Dataset) and 'units' in node.attrs
 
-    def validate(
-        self, tree: dict[str, Dataset | Group], node: Dataset | Group
-    ) -> Violation | None:
+    def validate(self, node: Dataset | Group) -> Violation | None:
         units = node.attrs['units']
         if units.startswith('NX_'):
             return Violation(node.name, f"Invalid units {units}")
@@ -105,9 +115,7 @@ class index_has_units(Validator):
         name = node.name.split('/')[-1]
         return isinstance(node, Dataset) and name in names
 
-    def validate(
-        self, tree: dict[str, Dataset | Group], node: Dataset | Group
-    ) -> Violation | None:
+    def validate(self, node: Dataset | Group) -> Violation | None:
         if 'units' in node.attrs:
             return Violation(node.name)
 
@@ -121,9 +129,7 @@ class float_dataset_has_no_units(Validator):
     def applies_to(self, node: Dataset | Group) -> bool:
         return isinstance(node, Dataset)
 
-    def validate(
-        self, tree: dict[str, Dataset | Group], node: Dataset | Group
-    ) -> Violation | None:
+    def validate(self, node: Dataset | Group) -> Violation | None:
         if node.dtype in ['float32', 'float64'] and 'units' not in node.attrs:
             return Violation(node.name)
 
@@ -142,9 +148,7 @@ class offset_units_missing(Validator):
     def applies_to(self, node: Dataset | Group) -> bool:
         return isinstance(node, Dataset) and is_transformation(node)
 
-    def validate(
-        self, tree: dict[str, Dataset | Group], node: Dataset | Group
-    ) -> Violation | None:
+    def validate(self, node: Dataset | Group) -> Violation | None:
         if 'offset' in node.attrs:
             if 'offset_units' not in node.attrs:
                 return Violation(node.name)
@@ -160,9 +164,7 @@ class transformation_depends_on_missing(Validator):
     def applies_to(self, node: Dataset | Group) -> bool:
         return isinstance(node, Dataset) and is_transformation(node)
 
-    def validate(
-        self, tree: dict[str, Dataset | Group], node: Dataset | Group
-    ) -> Violation | None:
+    def validate(self, node: Dataset | Group) -> Violation | None:
         if 'depends_on' not in node.attrs:
             return Violation(node.name)
 

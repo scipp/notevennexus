@@ -14,5 +14,6 @@ del importlib
 from . import validators
 from .hdf5 import read_hdf5
 from .io import make_fileinfo
+from .json import read_json
 from .tree import Dataset, Group, unroll_tree
 from .validate import Validator, report, validate

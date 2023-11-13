@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from .tree import Dataset, Group
+from .tree import Dataset, Group, unroll_tree
 
 
 @dataclass
@@ -50,7 +50,8 @@ class Validator:
         return self._violations
 
 
-def validate(tree: dict[str, Dataset | Group], validators: list[Validator]) -> None:
+def validate(group: Group, validators: list[Validator]) -> None:
+    tree = unroll_tree(group)
     for node in tree.values():
         for validator in validators:
             validator.apply(tree, node)

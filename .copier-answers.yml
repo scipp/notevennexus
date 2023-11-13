@@ -1,5 +1,5 @@
 # Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
-_commit: 9cf97d4
+_commit: 9f36884
 _src_path: gh:scipp/copier_template
 description: Validate NeXus files
 max_python: '3.12'
@@ -7,6 +7,7 @@ min_python: '3.10'
 namespace_package: ''
 nightly_deps: ''
 orgname: scipp
+prettyname: NotEvenNexus
 projectname: notevennexus
 related_projects: ScippNexus
 year: 2023

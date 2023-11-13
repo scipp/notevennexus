@@ -9,7 +9,7 @@ import notevennexus
 sys.path.insert(0, os.path.abspath('.'))
 
 # General information about the project.
-project = u'notevennexus'
+project = u'NotEvenNexus'
 copyright = u'2023 Scipp contributors'
 author = u'Scipp contributors'
 

@@ -38,5 +38,20 @@ class depends_on_exists(Validator):
             return Violation(node.name, f"depends_on target {target} is missing")
 
 
+class legacy_nexus_class(Validator):
+    def __init__(self) -> None:
+        super().__init__("legacy_NX_class", "Check if NX_class is deprecated")
+
+    def applies_to(self, node: Dataset | Group) -> bool:
+        return isinstance(node, Group)
+
+    def validate(
+        self, tree: dict[str, Dataset | Group], node: Dataset | Group
+    ) -> Violation | None:
+        if (nx_class := node.attrs.get("NX_class")) is not None:
+            if nx_class in ['NXgeometry', 'NXshape']:
+                return Violation(node.name, f"NX_class {nx_class} is deprecated")
+
+
 def base_validators():
-    return [has_NX_class_attr(), depends_on_exists()]
+    return [has_NX_class_attr(), depends_on_exists(), legacy_nexus_class()]

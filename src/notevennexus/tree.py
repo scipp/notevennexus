@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # Copyright (c) 2023 Scipp contributors (https://github.com/scipp)
 from __future__ import annotations
+
 from dataclasses import dataclass
 from typing import Any
 
@@ -30,9 +31,8 @@ class Group:
 def unroll_tree(tree: Group) -> dict[str, Dataset | Group]:
     """Unroll tree into a flat dictionary"""
     result = {}
-    for name, child in tree.children.items():
+    for child in tree.children.values():
+        result[child.name] = child
         if isinstance(child, Group):
             result.update(unroll_tree(child))
-        else:
-            result[child.name] = child
     return result

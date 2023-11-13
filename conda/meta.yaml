@@ -11,6 +11,7 @@ requirements:
     - setuptools
     - setuptools_scm
   run:
+    - h5py
     - python>=3.10
 
 test:

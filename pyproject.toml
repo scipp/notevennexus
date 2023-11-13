@@ -36,6 +36,9 @@ dependencies = [
 
 dynamic = ["version"]
 
+[project.scripts]
+notevennexus = "notevennexus.__main__:main"
+
 [project.urls]
 "Bug Tracker" = "https://github.com/scipp/notevennexus/issues"
 "Documentation" = "https://scipp.github.io/notevennexus"

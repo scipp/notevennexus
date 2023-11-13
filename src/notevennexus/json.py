@@ -86,7 +86,7 @@ def _read_dataset(dataset: dict[str, Any], parent: Group) -> Dataset:
     return Dataset(
         name=name,
         shape=None,
-        dtype=dataset["config"].get("type"),
+        dtype=_translate_dtype(dataset["config"].get("type")),
         attrs=_read_attrs(dataset),
         parent=parent,
     )
@@ -98,13 +98,22 @@ def _read_source(source: dict[str, Any], parent: Group) -> Dataset:
     ds = Dataset(
         name=name,
         shape=None,
-        dtype=source["config"]["dtype"],
+        dtype=_translate_dtype(source["config"]["dtype"]),
         attrs=_read_attrs(source),
         parent=parent,
     )
     if (units := source["config"].get("value_units")) is not None:
         ds.attrs['units'] = units
     return ds
+
+
+def _translate_dtype(dtype: str) -> str:
+    """Translate dtype from JSON to Python/NumPy"""
+    if dtype == "double":
+        return "float64"
+    if dtype == "float":
+        return "float32"
+    return dtype
 
 
 def _read_attrs(node: dict[str, Any]) -> dict[str, Any]:

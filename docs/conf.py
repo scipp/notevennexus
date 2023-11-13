@@ -132,7 +132,7 @@ html_theme_options = {
     },
     "external_links": [
         {"name": "ScippNexus", "url": "https://scipp.github.io/scippnexus"},
-        ],
+    ],
     "icon_links": [
         {
             "name": "GitHub",

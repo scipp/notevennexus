@@ -23,8 +23,8 @@ def main():
     group = nen.read_json(path) if _is_text_file(path) else nen.read_hdf5(path)
 
     validators = nen.validators.base_validators()
-    nen.validate(group, validators=validators)
-    print(nen.report(validators=validators))
+    results = nen.validate(group, validators=validators)
+    print(nen.report(results=results))
     print(nen.make_fileinfo(path))
 
 

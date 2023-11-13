@@ -25,8 +25,6 @@ class Validator(ABC):
     def __init__(self, name: str, description: str) -> None:
         self.name = name
         self.description = description
-        self._count = 0
-        self._violations: list[Violation] = []
 
     @abstractmethod
     def applies_to(self, node: Dataset | Group) -> bool:
@@ -36,39 +34,50 @@ class Validator(ABC):
     def validate(self, node: Dataset | Group) -> Violation | None:
         """Return a Violation if the given node violates this validator"""
 
+
+class ValidationResult:
+    def __init__(self, validator: Validator) -> None:
+        self.checks = 0
+        self.fails = 0
+        self.validator = validator
+        self.violations: list[Violation] = []
+
     def apply(self, node: Dataset | Group) -> None:
-        if self.applies_to(node):
-            self._count += 1
-            if (violation := self.validate(node)) is not None:
-                self._violations.append(violation)
+        if self.validator.applies_to(node):
+            self.checks += 1
+            if (violation := self.validator.validate(node)) is not None:
+                self.fails += 1
+                self.violations.append(violation)
 
-    @property
-    def count(self) -> int:
-        return self._count
+    def format_details(self) -> str:
+        details = ''
+        for violation in self.violations:
+            details += f"{self.validator.name} @ {violation.format()}\n"
+        return details
 
-    @property
-    def violations(self) -> list[Violation]:
-        return self._violations
+    def format_summary(self) -> str:
+        return f"{self.validator.name}: {self.fails}/{self.checks}\n"
 
 
-def validate(group: Group, validators: list[Validator]) -> None:
+def validate(group: Group, validators: list[Validator]) -> list[ValidationResult]:
     tree = unroll_tree(group)
+    results = [ValidationResult(v) for v in validators]
     for node in tree.values():
-        for validator in validators:
-            validator.apply(node)
+        for validation in results:
+            validation.apply(node)
+    return results
 
 
-def report(validators: list[Validator]) -> str:
+def report(results: list[ValidationResult]) -> str:
     details = 'Violations\n----------\n'
     summary = 'Summary\n-------\n'
     total_checks = 0
     total_violations = 0
-    for v in validators:
-        total_checks += v._count
-        total_violations += len(v.violations)
-        for violation in v.violations:
-            details += f"{v.name} @ {violation.format()}\n"
-        summary += f"{v.name}: {len(v.violations)}/{v._count}\n"
+    for result in results:
+        total_checks += result.checks
+        total_violations += result.fails
+        details += result.format_details()
+        summary += result.format_summary()
     summary += '\n'
     summary += f"Total: {total_violations}/{total_checks}"
     return f'{details}\n\n{summary}'

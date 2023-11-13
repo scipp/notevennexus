@@ -108,7 +108,6 @@ class index_has_units(Validator):
     def validate(
         self, tree: dict[str, Dataset | Group], node: Dataset | Group
     ) -> Violation | None:
-        print(node.name)
         if 'units' in node.attrs:
             return Violation(node.name)
 
@@ -133,9 +132,12 @@ def is_transformation(node: Dataset | Group) -> bool:
     return 'transformation_type' in node.attrs
 
 
-class missing_offset_units(Validator):
+class offset_units_missing(Validator):
     def __init__(self) -> None:
-        super().__init__("missing_offset_units", "Offset should have units attribute")
+        super().__init__(
+            "offset_units_missing",
+            "Transformation with offset attr should also have offset_units attr.",
+        )
 
     def applies_to(self, node: Dataset | Group) -> bool:
         return isinstance(node, Dataset) and is_transformation(node)
@@ -174,6 +176,6 @@ def base_validators():
         invalid_units(),
         index_has_units(),
         float_dataset_has_no_units(),
-        missing_offset_units(),
+        offset_units_missing(),
         transformation_depends_on_missing(),
     ]

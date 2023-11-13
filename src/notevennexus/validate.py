@@ -41,18 +41,31 @@ class Validator:
             if (violation := self.validate(tree, node)) is not None:
                 self._violations.append(violation)
 
+    @property
+    def count(self) -> int:
+        return self._count
+
+    @property
     def violations(self) -> list[Violation]:
         return self._violations
-
-    def report(self) -> str:
-        content = '\n    '.join([v.format() for v in self.violations()])
-        violations = (
-            f'Violations ({len(self._violations)}/{self._count}):\n    {content}'
-        )
-        return f"{self.name}: {self.description}\n{violations}"
 
 
 def validate(tree: dict[str, Dataset | Group], validators: list[Validator]) -> None:
     for node in tree.values():
         for validator in validators:
             validator.apply(tree, node)
+
+
+def report(validators: list[Validator]) -> str:
+    details = 'Violations\n----------\n'
+    summary = 'Summary\n-------\n'
+    total_checks = 0
+    total_violations = 0
+    for v in validators:
+        total_checks += v._count
+        total_violations += len(v.violations)
+        for violation in v.violations:
+            details += f"{v.name} @ {violation.format()}\n"
+        summary += f"{v.name}: {len(v.violations)}/{v._count}\n"
+    summary += f"Total: {total_violations}/{total_checks}"
+    return f'{details}\n\n{summary}'

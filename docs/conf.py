@@ -163,7 +163,7 @@ html_sidebars = {
     "**": ["sidebar-nav-bs", "page-toc"],
 }
 
-html_title = "notevennexus"
+html_title = "NotEvenNexus"
 html_logo = "_static/logo.svg"
 html_favicon = "_static/favicon.ico"
 

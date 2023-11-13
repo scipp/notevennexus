@@ -28,25 +28,22 @@ class depends_on_target_missing(Validator):
             target = node.value
         else:
             target = node.attrs["depends_on"]
-        if target != '.':
-            if not isinstance(target, str):
-                return Violation(
-                    node.name, f"depends_on target {target} is not a string"
-                )
-            path = target.split('/')
-            if path[0] == '':
-                start = self._find_root(node)
-                path = path[1:]
-            else:
-                start = node.parent
-            if path[0] == '.':
-                path = path[1:]
-            for name in path:
-                if name not in start.children:
-                    return Violation(
-                        node.name, f"depends_on target {target} is missing"
-                    )
-                start = start.children[name]
+        if target == '.':
+            return None
+        if not isinstance(target, str):
+            return Violation(node.name, f"depends_on target {target} is not a string")
+        path = target.split('/')
+        if path[0] == '':
+            start = self._find_root(node)
+            path = path[1:]
+        else:
+            start = node.parent
+        if path[0] == '.':
+            path = path[1:]
+        for name in path:
+            if name not in start.children:
+                return Violation(node.name, f"depends_on target {target} is missing")
+            start = start.children[name]
 
     def _find_root(self, node: Dataset | Group) -> Dataset | Group:
         while node.parent is not None:

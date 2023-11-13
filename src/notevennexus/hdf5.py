@@ -45,6 +45,8 @@ def _read_dataset(dataset: h5py.Dataset, parent: Group) -> Dataset:
         attrs=_read_attrs(dataset),
         parent=parent,
     )
-    if ds.dtype == "object" and ds.shape == ():
-        ds.value = dataset[()].decode(encoding='utf-8')
+    try:
+        ds.value = dataset.asstr()[()]
+    except TypeError:
+        pass
     return ds

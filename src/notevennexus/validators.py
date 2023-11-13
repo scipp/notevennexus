@@ -51,9 +51,9 @@ class depends_on_target_missing(Validator):
         return node
 
 
-class legacy_nexus_class(Validator):
+class NX_class_is_legacy(Validator):
     def __init__(self) -> None:
-        super().__init__("legacy_NX_class", "Check if NX_class is deprecated")
+        super().__init__("NX_class_is_legacy", "Check if NX_class is deprecated")
 
     def applies_to(self, node: Dataset | Group) -> bool:
         return isinstance(node, Group) and "NX_class" in node.attrs
@@ -76,9 +76,9 @@ class group_has_units(Validator):
             return Violation(node.name)
 
 
-class invalid_units(Validator):
+class units_invalid(Validator):
     def __init__(self) -> None:
-        super().__init__("invalid_units", "Invalid units")
+        super().__init__("units_invalid", "Invalid units attribute")
 
     def applies_to(self, node: Dataset | Group) -> bool:
         return isinstance(node, Dataset) and 'units' in node.attrs
@@ -111,19 +111,29 @@ class index_has_units(Validator):
             'winding_order',
         ]
         name = node.name.split('/')[-1]
-        return (
-            isinstance(node, Dataset) and name in names or name.startswith('pixel_mask')
-        )
+        return isinstance(node, Dataset) and name in names
 
     def validate(self, node: Dataset | Group) -> Violation | None:
         if 'units' in node.attrs:
             return Violation(node.name)
 
 
-class float_dataset_has_no_units(Validator):
+class mask_has_units(Validator):
+    def __init__(self) -> None:
+        super().__init__("mask_has_units", "Mask should not have units attribute")
+
+    def applies_to(self, node: Dataset | Group) -> bool:
+        return isinstance(node, Dataset) and node.name.startswith('pixel_mask')
+
+    def validate(self, node: Dataset | Group) -> Violation | None:
+        if 'units' in node.attrs:
+            return Violation(node.name)
+
+
+class float_dataset_units_missing(Validator):
     def __init__(self) -> None:
         super().__init__(
-            "float_dataset_has_no_units", "Float dataset should have units attribute"
+            "float_dataset_units_missing", "Float dataset should have units attribute"
         )
 
     def applies_to(self, node: Dataset | Group) -> bool:
@@ -138,10 +148,10 @@ def is_transformation(node: Dataset | Group) -> bool:
     return 'transformation_type' in node.attrs
 
 
-class offset_units_missing(Validator):
+class transformation_offset_units_missing(Validator):
     def __init__(self) -> None:
         super().__init__(
-            "offset_units_missing",
+            "transformation_offset_units_missing",
             "Transformation with offset attr should also have offset_units attr.",
         )
 
@@ -160,7 +170,7 @@ class offset_units_missing(Validator):
 class transformation_depends_on_missing(Validator):
     def __init__(self) -> None:
         super().__init__(
-            "transformation_missing_depends_on",
+            "transformation_depends_on_missing",
             "Transformation should have depends_on attribute",
         )
 
@@ -227,14 +237,15 @@ class depends_on_missing(Validator):
 
 def base_validators():
     return [
-        NX_class_attr_missing(),
-        depends_on_target_missing(),
-        legacy_nexus_class(),
-        group_has_units(),
-        invalid_units(),
-        index_has_units(),
-        float_dataset_has_no_units(),
-        offset_units_missing(),
-        transformation_depends_on_missing(),
         depends_on_missing(),
+        depends_on_target_missing(),
+        float_dataset_units_missing(),
+        group_has_units(),
+        index_has_units(),
+        mask_has_units(),
+        NX_class_attr_missing(),
+        NX_class_is_legacy(),
+        transformation_depends_on_missing(),
+        transformation_offset_units_missing(),
+        units_invalid(),
     ]

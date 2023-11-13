@@ -98,19 +98,20 @@ class index_has_units(Validator):
 
     def applies_to(self, node: Dataset | Group) -> bool:
         names = [
+            'cue_index',
+            'cylinders',
+            'detector_faces',
             'detector_number',
-            'detector_id',
-            'detector_index',
             'event_id',
             'event_index',
-            'winding_order',
             'faces',
-            'detector_faces',
-            'cylinders',
-            'cue_index',
+            'image_key',
+            'winding_order',
         ]
         name = node.name.split('/')[-1]
-        return isinstance(node, Dataset) and name in names
+        return (
+            isinstance(node, Dataset) and name in names or name.startswith('pixel_mask')
+        )
 
     def validate(self, node: Dataset | Group) -> Violation | None:
         if 'units' in node.attrs:

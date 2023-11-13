@@ -96,6 +96,11 @@ class index_has_units(Validator):
             'detector_index',
             'event_id',
             'event_index',
+            'winding_order',
+            'faces',
+            'detector_faces',
+            'cylinders',
+            'cue_index',
         ]
         name = node.name.split('/')[-1]
         return isinstance(node, Dataset) and name in names

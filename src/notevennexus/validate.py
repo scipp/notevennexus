@@ -59,21 +59,21 @@ class ValidationResult:
         return f"{self.validator.name}: {self.fails}/{self.checks}\n"
 
 
-def validate(group: Group, validators: list[Validator]) -> list[ValidationResult]:
+def validate(group: Group, validators: list[Validator]) -> dict[type, ValidationResult]:
     tree = unroll_tree(group)
-    results = [ValidationResult(v) for v in validators]
+    results = {type(v): ValidationResult(v) for v in validators}
     for node in tree.values():
-        for validation in results:
+        for validation in results.values():
             validation.apply(node)
     return results
 
 
-def report(results: list[ValidationResult]) -> str:
+def report(results: dict[type, ValidationResult]) -> str:
     details = 'Violations\n----------\n'
     summary = 'Summary\n-------\n'
     total_checks = 0
     total_violations = 0
-    for result in results:
+    for result in results.values():
         total_checks += result.checks
         total_violations += result.fails
         details += result.format_details()

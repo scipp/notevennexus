@@ -41,7 +41,7 @@ def _read_dataset(dataset: h5py.Dataset, parent: Group) -> Dataset:
     ds = Dataset(
         name=dataset.name,
         shape=dataset.shape,
-        dtype=str(dataset.dtype),
+        dtype=dataset.dtype,
         attrs=_read_attrs(dataset),
         parent=parent,
     )

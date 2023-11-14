@@ -3,6 +3,8 @@
 import json
 from typing import Any
 
+import numpy as np
+
 from .tree import Dataset, Group
 
 
@@ -83,10 +85,12 @@ def _read_group(group: dict[str, Any], parent: Group | None = None) -> Group:
 def _read_dataset(dataset: dict[str, Any], parent: Group) -> Dataset:
     """Read JSON dataset"""
     name = parent.name + '/' + dataset['config']["name"]
+    if (values := dataset["config"].get("values")) is not None:
+        type_from_values = type(values)
     return Dataset(
         name=name,
         shape=None,
-        dtype=_translate_dtype(dataset["config"].get("type")),
+        dtype=_translate_dtype(dataset["config"].get("type", type_from_values)),
         attrs=_read_attrs(dataset),
         parent=parent,
     )
@@ -110,10 +114,12 @@ def _read_source(source: dict[str, Any], parent: Group) -> Dataset:
 def _translate_dtype(dtype: str) -> str:
     """Translate dtype from JSON to Python/NumPy"""
     if dtype == "double":
-        return "float64"
+        return np.float64
     if dtype == "float":
-        return "float32"
-    return dtype
+        return np.float32
+    if dtype == "string":
+        return np.dtype('U')
+    return np.dtype(dtype)
 
 
 def _read_attrs(node: dict[str, Any]) -> dict[str, Any]:

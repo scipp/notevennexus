@@ -1,5 +1,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # Copyright (c) 2023 Scipp contributors (https://github.com/scipp)
+import numpy as np
+
 from .tree import Dataset, Group
 from .validate import Validator, Violation
 
@@ -137,10 +139,25 @@ class float_dataset_units_missing(Validator):
         )
 
     def applies_to(self, node: Dataset | Group) -> bool:
-        return isinstance(node, Dataset) and node.dtype in ['float32', 'float64']
+        return isinstance(node, Dataset) and node.dtype in [np.float32, np.float64]
 
     def validate(self, node: Dataset | Group) -> Violation | None:
         if 'units' not in node.attrs:
+            return Violation(node.name)
+
+
+class non_numeric_dataset_has_units(Validator):
+    def __init__(self) -> None:
+        super().__init__(
+            "non_numeric_dataset_has_units",
+            "Non-numeric dataset should not have units attribute",
+        )
+
+    def applies_to(self, node: Dataset | Group) -> bool:
+        return isinstance(node, Dataset) and not np.issubdtype(node.dtype, np.number)
+
+    def validate(self, node: Dataset | Group) -> Violation | None:
+        if 'units' in node.attrs:
             return Violation(node.name)
 
 
@@ -243,6 +260,7 @@ def base_validators():
         group_has_units(),
         index_has_units(),
         mask_has_units(),
+        non_numeric_dataset_has_units(),
         NX_class_attr_missing(),
         NX_class_is_legacy(),
         transformation_depends_on_missing(),

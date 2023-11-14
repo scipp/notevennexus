@@ -2,7 +2,7 @@
 # Copyright (c) 2023 Scipp contributors (https://github.com/scipp)
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
 
 
@@ -13,8 +13,8 @@ class Dataset:
     name: str
     shape: tuple[int, ...]
     dtype: str
-    attrs: dict[str, Any]
     parent: Group
+    attrs: dict[str, Any] = field(default_factory=dict)
     value: Any | None = None
 
 
@@ -23,9 +23,9 @@ class Group:
     """Info about an HDF5 group"""
 
     name: str
-    attrs: dict[str, Any]
-    children: dict[str, Dataset | Group]
-    parent: Group | None
+    parent: Group | None = None
+    attrs: dict[str, Any] = field(default_factory=dict)
+    children: dict[str, Dataset | Group] = field(default_factory=dict)
 
 
 def unroll_tree(tree: Group) -> dict[str, Dataset | Group]:

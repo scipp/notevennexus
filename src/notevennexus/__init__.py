@@ -13,7 +13,7 @@ del importlib
 
 from . import validators
 from .hdf5 import read_hdf5
-from .io import make_fileinfo
+from .io import compute_checksum, make_fileinfo
 from .json import read_json
 from .tree import Dataset, Group, unroll_tree
 from .validate import Validator, Violation, report, validate

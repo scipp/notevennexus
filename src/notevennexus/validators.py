@@ -51,7 +51,7 @@ class depends_on_target_missing(Validator):
             start = start.children[name]
         if not is_transformation(start):
             return Violation(
-                node.name, f"depends_on target {target} is not a transform"
+                node.name, f"depends_on target {target} is not a transformation"
             )
 
     def _find_root(self, node: Dataset | Group) -> Dataset | Group:

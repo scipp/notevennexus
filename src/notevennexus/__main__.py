@@ -18,7 +18,7 @@ def _is_text_file(path: str) -> bool:
 def main():
     parser = argparse.ArgumentParser(description='Validate NeXus files.')
     parser.add_argument(
-        '--checksums', action='store_true', help='Compute and print of checksum'
+        '--checksums', action='store_true', help='Compute and print checksums'
     )
     parser.add_argument('path', help='Input file')
     args = parser.parse_args()

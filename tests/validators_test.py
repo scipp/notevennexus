@@ -44,6 +44,12 @@ def test_depends_on_target_missing():
         attrs={'depends_on': 'missing'},
     )
     group.children['transform'] = transform
+    result = nen.validators.depends_on_target_missing().validate(depends_on)
+    # Still fails because 'transform' is not a transform
+    assert isinstance(result, nen.Violation)
+    assert result.name == 'x/depends_on'
+    transform.attrs['transformation_type'] = 'translation'
+    transform.attrs['vector'] = [1.0, 0.0, 0.0]
     assert nen.validators.depends_on_target_missing().validate(depends_on) is None
     assert nen.validators.depends_on_target_missing().applies_to(transform)
     result = nen.validators.depends_on_target_missing().validate(transform)
@@ -188,7 +194,11 @@ def test_transformation_depends_on_missing():
         shape=None,
         dtype=float,
         parent=None,
-        attrs={'transformation_type': 'translation', 'depends_on': '.'},
+        attrs={
+            'transformation_type': 'translation',
+            'vector': [1.0, 0.0, 0.0],
+            'depends_on': '.',
+        },
     )
     assert nen.validators.transformation_depends_on_missing().applies_to(good)
     assert nen.validators.transformation_depends_on_missing().validate(good) is None
@@ -198,7 +208,10 @@ def test_transformation_depends_on_missing():
         shape=None,
         dtype=float,
         parent=None,
-        attrs={'transformation_type': 'translation'},
+        attrs={
+            'transformation_type': 'translation',
+            'vector': [1.0, 0.0, 0.0],
+        },
     )
     assert nen.validators.transformation_depends_on_missing().applies_to(bad)
     result = nen.validators.transformation_depends_on_missing().validate(bad)
@@ -215,6 +228,7 @@ def test_transformation_offset_units_missing():
         parent=None,
         attrs={
             'transformation_type': 'translation',
+            'vector': [1.0, 0.0, 0.0],
             'offset': 1.0,
             'offset_units': 'm',
         },
@@ -227,7 +241,11 @@ def test_transformation_offset_units_missing():
         shape=None,
         dtype=float,
         parent=None,
-        attrs={'transformation_type': 'translation', 'offset': 1.0},
+        attrs={
+            'transformation_type': 'translation',
+            'vector': [1.0, 0.0, 0.0],
+            'offset': 1.0,
+        },
     )
     assert nen.validators.transformation_offset_units_missing().applies_to(bad)
     result = nen.validators.transformation_offset_units_missing().validate(bad)

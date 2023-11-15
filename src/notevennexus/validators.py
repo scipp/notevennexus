@@ -20,7 +20,10 @@ class NX_class_attr_missing(Validator):
 
 class depends_on_target_missing(Validator):
     def __init__(self) -> None:
-        super().__init__("depends_on_target_missing", "depends_on target is missing")
+        super().__init__(
+            "depends_on_target_missing",
+            "depends_on target is missing or is not a transformation.",
+        )
 
     def applies_to(self, node: Dataset | Group) -> bool:
         return node.name.endswith('/depends_on') or "depends_on" in node.attrs
@@ -46,6 +49,10 @@ class depends_on_target_missing(Validator):
             if name not in start.children:
                 return Violation(node.name, f"depends_on target {target} is missing")
             start = start.children[name]
+        if not is_transformation(start):
+            return Violation(
+                node.name, f"depends_on target {target} is not a transform"
+            )
 
     def _find_root(self, node: Dataset | Group) -> Dataset | Group:
         while node.parent is not None:
@@ -162,7 +169,7 @@ class non_numeric_dataset_has_units(Validator):
 
 
 def is_transformation(node: Dataset | Group) -> bool:
-    return 'transformation_type' in node.attrs
+    return 'transformation_type' in node.attrs and 'vector' in node.attrs
 
 
 class transformation_offset_units_missing(Validator):

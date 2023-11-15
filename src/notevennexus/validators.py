@@ -20,7 +20,10 @@ class NX_class_attr_missing(Validator):
 
 class depends_on_target_missing(Validator):
     def __init__(self) -> None:
-        super().__init__("depends_on_target_missing", "depends_on target is missing")
+        super().__init__(
+            "depends_on_target_missing",
+            "depends_on target is missing or is not a transformation.",
+        )
 
     def applies_to(self, node: Dataset | Group) -> bool:
         return node.name.endswith('/depends_on') or "depends_on" in node.attrs
@@ -46,6 +49,10 @@ class depends_on_target_missing(Validator):
             if name not in start.children:
                 return Violation(node.name, f"depends_on target {target} is missing")
             start = start.children[name]
+        if not is_transformation(start):
+            return Violation(
+                node.name, f"depends_on target {target} is not a transformation"
+            )
 
     def _find_root(self, node: Dataset | Group) -> Dataset | Group:
         while node.parent is not None:
@@ -87,10 +94,9 @@ class units_invalid(Validator):
 
     def validate(self, node: Dataset | Group) -> Violation | None:
         units = node.attrs['units']
-        if units.startswith('NX_'):  # Placeholder from NeXus standard
-            return Violation(node.name, f"Invalid units {units}")
         invalid = ['hz']
-        if units in invalid:
+        # Units starting with NX_ are likely placeholders from the NeXus standard
+        if units.startswith('NX_') or units in invalid:
             return Violation(node.name, f"Invalid units {units}")
 
 
@@ -162,7 +168,7 @@ class non_numeric_dataset_has_units(Validator):
 
 
 def is_transformation(node: Dataset | Group) -> bool:
-    return 'transformation_type' in node.attrs
+    return 'transformation_type' in node.attrs and 'vector' in node.attrs
 
 
 class transformation_offset_units_missing(Validator):

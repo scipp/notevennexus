@@ -9,7 +9,7 @@ def _is_text_file(path: str) -> bool:
     """Check if file is text file"""
     try:
         with open(path, 'r') as f:
-            f.read()
+            f.readline()
         return True
     except UnicodeDecodeError:
         return False
@@ -17,6 +17,9 @@ def _is_text_file(path: str) -> bool:
 
 def main():
     parser = argparse.ArgumentParser(description='Validate NeXus files.')
+    parser.add_argument(
+        '--checksums', action='store_true', help='Compute and print checksums'
+    )
     parser.add_argument('path', help='Input file')
     args = parser.parse_args()
     path = args.path
@@ -26,6 +29,8 @@ def main():
     results = nen.validate(group, validators=validators)
     print(nen.report(results=results))
     print(nen.make_fileinfo(path))
+    if args.checksums:
+        print(nen.compute_checksum(path))
 
 
 if __name__ == '__main__':

@@ -9,7 +9,7 @@ def _is_text_file(path: str) -> bool:
     """Check if file is text file"""
     try:
         with open(path, 'r') as f:
-            f.read()
+            f.readline()
         return True
     except UnicodeDecodeError:
         return False

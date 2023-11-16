@@ -8,13 +8,13 @@
 ## Install
 
 ```bash
-pip install notevennexus
+pip install chexus
 ```
 
 ## Run
 
 ```bash
-notevennexus <path-to-nexus-file>
+chexus <path-to-nexus-file>
 ```
 
 This supports HDF5 as well as some JSON format.

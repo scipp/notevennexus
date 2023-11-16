@@ -37,7 +37,7 @@ dependencies = [
 dynamic = ["version"]
 
 [project.scripts]
-notevennexus = "notevennexus.__main__:main"
+chexus = "chexus.__main__:main"
 
 [project.urls]
 "Bug Tracker" = "https://github.com/scipp/chexus/issues"

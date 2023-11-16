@@ -2,7 +2,7 @@
 # Copyright (c) 2023 Scipp contributors (https://github.com/scipp)
 import argparse
 
-import notevennexus as nen
+import chexus
 
 
 def _is_text_file(path: str) -> bool:
@@ -23,14 +23,14 @@ def main():
     parser.add_argument('path', help='Input file')
     args = parser.parse_args()
     path = args.path
-    group = nen.read_json(path) if _is_text_file(path) else nen.read_hdf5(path)
+    group = chexus.read_json(path) if _is_text_file(path) else chexus.read_hdf5(path)
 
-    validators = nen.validators.base_validators()
-    results = nen.validate(group, validators=validators)
-    print(nen.report(results=results))
-    print(nen.make_fileinfo(path))
+    validators = chexus.validators.base_validators()
+    results = chexus.validate(group, validators=validators)
+    print(chexus.report(results=results))
+    print(chexus.make_fileinfo(path))
     if args.checksums:
-        print(nen.compute_checksum(path))
+        print(chexus.compute_checksum(path))
 
 
 if __name__ == '__main__':

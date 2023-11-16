@@ -4,12 +4,12 @@ import doctest
 import os
 import sys
 
-import notevennexus
+import chexus
 
 sys.path.insert(0, os.path.abspath('.'))
 
 # General information about the project.
-project = u'NotEvenNexus'
+project = u'Chexus'
 copyright = u'2023 Scipp contributors'
 author = u'Scipp contributors'
 
@@ -91,9 +91,9 @@ master_doc = 'index'
 #
 
 # The short X.Y version.
-version = notevennexus.__version__
+version = chexus.__version__
 # The full version, including alpha/beta/rc tags.
-release = notevennexus.__version__
+release = chexus.__version__
 
 warning_is_error = True
 
@@ -136,19 +136,19 @@ html_theme_options = {
     "icon_links": [
         {
             "name": "GitHub",
-            "url": "https://github.com/scipp/notevennexus",
+            "url": "https://github.com/scipp/chexus",
             "icon": "fa-brands fa-github",
             "type": "fontawesome",
         },
         {
             "name": "PyPI",
-            "url": "https://pypi.org/project/notevennexus/",
+            "url": "https://pypi.org/project/chexus/",
             "icon": "fa-brands fa-python",
             "type": "fontawesome",
         },
         {
             "name": "Conda",
-            "url": "https://anaconda.org/conda-forge/notevennexus",
+            "url": "https://anaconda.org/conda-forge/chexus",
             "icon": "_static/anaconda-logo.svg",
             "type": "local",
         },
@@ -163,7 +163,7 @@ html_sidebars = {
     "**": ["sidebar-nav-bs", "page-toc"],
 }
 
-html_title = "NotEvenNexus"
+html_title = "Chexus"
 html_logo = "_static/logo.svg"
 html_favicon = "_static/favicon.ico"
 
@@ -176,7 +176,7 @@ html_css_files = ["css/custom.css"]
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'notevennexusdoc'
+htmlhelp_basename = 'chexusdoc'
 
 # -- Options for Matplotlib in notebooks ----------------------------------
 

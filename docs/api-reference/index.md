@@ -3,7 +3,7 @@
 ## Classes
 
 ```{eval-rst}
-.. currentmodule:: notevennexus
+.. currentmodule:: chexus
 
 .. autosummary::
    :toctree: ../generated/classes

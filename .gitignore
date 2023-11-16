@@ -1,7 +1,7 @@
 dist
 html
 .tox
-src/notevennexus.egg-info
+src/chexus.egg-info
 
 *.sw?
 

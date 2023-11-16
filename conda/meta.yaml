@@ -1,5 +1,5 @@
 package:
-  name: notevennexus
+  name: chexus
 
   version: {{ GIT_DESCRIBE_TAG }}
 
@@ -16,7 +16,7 @@ requirements:
 
 test:
   imports:
-    - notevennexus
+    - chexus
   requires:
     - pytest
   source_files:
@@ -31,9 +31,9 @@ build:
     - pip install .
 
 about:
-  home: https://github.com/scipp/notevennexus
+  home: https://github.com/scipp/chexus
   license: BSD-3-Clause
-  summary: Validate NeXus files
-  description: Validate NeXus files
-  dev_url: https://github.com/scipp/notevennexus
-  doc_url: https://scipp.github.io/notevennexus
+  summary: Validate and check NeXus files
+  description: Validate and check NeXus files
+  dev_url: https://github.com/scipp/chexus
+  doc_url: https://scipp.github.io/chexus

@@ -6,8 +6,8 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "notevennexus"
-description = "Validate NeXus files"
+name = "chexus"
+description = "Validate and check NeXus files"
 authors = [{ name = "Scipp contributors" }]
 license = { file = "LICENSE" }
 readme = "README.md"
@@ -40,9 +40,9 @@ dynamic = ["version"]
 notevennexus = "notevennexus.__main__:main"
 
 [project.urls]
-"Bug Tracker" = "https://github.com/scipp/notevennexus/issues"
-"Documentation" = "https://scipp.github.io/notevennexus"
-"Source" = "https://github.com/scipp/notevennexus"
+"Bug Tracker" = "https://github.com/scipp/chexus/issues"
+"Documentation" = "https://scipp.github.io/chexus"
+"Source" = "https://github.com/scipp/chexus"
 
 [tool.setuptools_scm]
 
@@ -64,7 +64,7 @@ skip-string-normalization = true
 [tool.isort]
 skip_gitignore = true
 profile = "black"
-known_first_party = ["notevennexus"]
+known_first_party = ["chexus"]
 
 [tool.mypy]
 strict = true

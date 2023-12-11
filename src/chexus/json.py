@@ -73,7 +73,7 @@ def _read_group(group: dict[str, Any], parent: Group | None = None) -> Group:
             grp.children[child["config"]["name"]] = _read_dataset(child, parent=grp)
         elif module in ["f142", 'f144']:
             grp.children[child["config"]["source"]] = _read_source(child, parent=grp)
-        elif module in ['tdct', 'ev44']:
+        elif module in ['tdct', 'ev42', 'ev44']:
             # No useful info in these?
             pass
         else:

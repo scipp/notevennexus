@@ -12,4 +12,6 @@ packaging==23.2
 pyproject-hooks==1.0.0
     # via build
 tomli==2.0.1
-    # via build
+    # via
+    #   build
+    #   pyproject-hooks

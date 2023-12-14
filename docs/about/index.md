@@ -1,4 +1,4 @@
-# About Chexus
+# About
 
 ## Development
 

@@ -8,5 +8,5 @@
 -r basetest.txt
 h5py==3.10.0
     # via -r nightly.in
-numpy==1.26.2
+numpy==1.26.3
     # via h5py

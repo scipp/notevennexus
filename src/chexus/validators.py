@@ -205,6 +205,34 @@ class transformation_depends_on_missing(Validator):
             return Violation(node.name)
 
 
+class chopper_frequency_units_invalid(Validator):
+    def __init__(self) -> None:
+        super().__init__(
+            "chopper_frequency_unit_invalid",
+            "The unit of NXdisk_chopper.rotation_speed should have dimension 1/Time",
+        )
+
+    def applies_to(self, node: Dataset | Group) -> bool:
+        return (
+            isinstance(node, Group)
+            and node.attrs.get('NX_class') == 'NXdisk_chopper'
+            and 'rotation_speed' in node.children
+        )
+
+    def validate(self, node: Dataset | Group) -> Violation | None:
+        import scipp as sc
+
+        if 'units' in node.children.get('rotation_speed').attrs:
+            unit = node.children.get('rotation_speed').attrs.get('units')
+            try:
+                sc.scalar(1, unit=unit).to(unit='Hz')
+            except sc.UnitError:
+                pass
+            else:
+                return
+        return Violation(node.name)
+
+
 physical_components = [
     'NXaperture',
     'NXattenuator',
@@ -258,8 +286,8 @@ class depends_on_missing(Validator):
             return Violation(node.name)
 
 
-def base_validators():
-    return [
+def base_validators(*, has_scipp=True):
+    validators = [
         depends_on_missing(),
         depends_on_target_missing(),
         float_dataset_units_missing(),
@@ -273,3 +301,8 @@ def base_validators():
         transformation_offset_units_missing(),
         units_invalid(),
     ]
+    if has_scipp:
+        validators += [
+            chopper_frequency_units_invalid(),
+        ]
+    return validators

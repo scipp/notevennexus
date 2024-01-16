@@ -255,7 +255,7 @@ def test_transformation_offset_units_missing():
     assert result.name == 'x'
 
 
-@pytest.mark.parametrize('units', ['NX_LENGTH', 'NX_DIMENSIONLESS', 'hz'])
+@pytest.mark.parametrize('units', ['NX_LENGTH', 'NX_DIMENSIONLESS', 'hz', ['m']])
 def test_units_invalid(units: str):
     good = chexus.Dataset(
         name='x', shape=None, dtype=float, parent=None, attrs={'units': ''}

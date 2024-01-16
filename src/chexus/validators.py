@@ -95,6 +95,8 @@ class units_invalid(Validator):
     def validate(self, node: Dataset | Group) -> Violation | None:
         units = node.attrs['units']
         invalid = ['hz']
+        if not isinstance(units, str):
+            return Violation(node.name, f'Invalid units type {type(units)}')
         # Units starting with NX_ are likely placeholders from the NeXus standard
         if units.startswith('NX_') or units in invalid:
             return Violation(node.name, f"Invalid units {units}")

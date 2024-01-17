@@ -8,9 +8,9 @@
 -r base.txt
 accessible-pygments==0.0.4
     # via pydata-sphinx-theme
-alabaster==0.7.13
+alabaster==0.7.16
     # via sphinx
-attrs==23.1.0
+attrs==23.2.0
     # via
     #   jsonschema
     #   referencing
@@ -28,7 +28,7 @@ certifi==2023.11.17
     # via requests
 charset-normalizer==3.3.2
     # via requests
-comm==0.2.0
+comm==0.2.1
     # via ipykernel
 debugpy==1.8.0
     # via ipykernel
@@ -40,15 +40,15 @@ docutils==0.20.1
     #   nbsphinx
     #   pydata-sphinx-theme
     #   sphinx
-fastjsonschema==2.19.0
+fastjsonschema==2.19.1
     # via nbformat
 idna==3.6
     # via requests
 imagesize==1.4.1
     # via sphinx
-ipykernel==6.27.1
+ipykernel==6.28.0
     # via -r docs.in
-jinja2==3.1.2
+jinja2==3.1.3
     # via
     #   myst-parser
     #   nbconvert
@@ -56,13 +56,13 @@ jinja2==3.1.2
     #   sphinx
 jsonschema==4.20.0
     # via nbformat
-jsonschema-specifications==2023.11.2
+jsonschema-specifications==2023.12.1
     # via jsonschema
 jupyter-client==8.6.0
     # via
     #   ipykernel
     #   nbclient
-jupyter-core==5.5.0
+jupyter-core==5.7.1
     # via
     #   ipykernel
     #   jupyter-client
@@ -89,7 +89,7 @@ myst-parser==2.0.0
     # via -r docs.in
 nbclient==0.9.0
     # via nbconvert
-nbconvert==7.12.0
+nbconvert==7.14.0
     # via nbsphinx
 nbformat==5.9.2
     # via
@@ -110,9 +110,9 @@ pandocfilters==1.5.0
     # via nbconvert
 platformdirs==4.1.0
     # via jupyter-core
-psutil==5.9.6
+psutil==5.9.7
     # via ipykernel
-pydata-sphinx-theme==0.14.4
+pydata-sphinx-theme==0.15.1
     # via -r docs.in
 python-dateutil==2.8.2
     # via jupyter-client
@@ -122,13 +122,13 @@ pyzmq==25.1.2
     # via
     #   ipykernel
     #   jupyter-client
-referencing==0.32.0
+referencing==0.32.1
     # via
     #   jsonschema
     #   jsonschema-specifications
 requests==2.31.0
     # via sphinx
-rpds-py==0.13.2
+rpds-py==0.16.2
     # via
     #   jsonschema
     #   referencing

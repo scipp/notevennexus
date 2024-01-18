@@ -30,7 +30,7 @@ click==8.1.7
     # via
     #   pip-compile-multi
     #   pip-tools
-copier==9.1.0
+copier==9.1.1
     # via -r dev.in
 dunamai==1.19.0
     # via copier
@@ -46,16 +46,16 @@ json5==0.9.14
     # via jupyterlab-server
 jsonpointer==2.4
     # via jsonschema
-jsonschema[format-nongpl]==4.20.0
+jsonschema[format-nongpl]==4.21.0
     # via
     #   jupyter-events
     #   jupyterlab-server
     #   nbformat
 jupyter-events==0.9.0
     # via jupyter-server
-jupyter-lsp==2.2.1
+jupyter-lsp==2.2.2
     # via jupyterlab
-jupyter-server==2.12.3
+jupyter-server==2.12.5
     # via
     #   jupyter-lsp
     #   jupyterlab
@@ -91,7 +91,7 @@ python-json-logger==2.0.7
     # via jupyter-events
 pyyaml-include==1.3.2
     # via copier
-questionary==2.0.1
+questionary==1.10.0
     # via copier
 rfc3339-validator==0.1.4
     # via

@@ -1,13 +1,13 @@
 # Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
-_commit: 8cfdb1b
+_commit: 0b94d03
 _src_path: gh:scipp/copier_template
 description: Validate and check NeXus files
 max_python: '3.12'
 min_python: '3.10'
 namespace_package: ''
-nightly_deps: ''
+nightly_deps: scipp
 orgname: scipp
 prettyname: Chexus
 projectname: chexus
 related_projects: ScippNexus
-year: 2023
+year: 2024

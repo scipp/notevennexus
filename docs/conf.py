@@ -8,9 +8,11 @@ import chexus
 
 sys.path.insert(0, os.path.abspath('.'))
 
+from _typehints import typehints_formatter_for  # noqa: E402
+
 # General information about the project.
 project = u'Chexus'
-copyright = u'2023 Scipp contributors'
+copyright = u'2024 Scipp contributors'
 author = u'Scipp contributors'
 
 html_show_sourcelink = True
@@ -54,6 +56,7 @@ autodoc_type_aliases = {
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3', None),
     'numpy': ('https://numpy.org/doc/stable/', None),
+    'scipp': ('https://scipp.github.io/', None),
 }
 
 # autodocs includes everything, even irrelevant API internals. autosummary
@@ -72,6 +75,7 @@ napoleon_type_aliases = {
 }
 typehints_defaults = 'comma'
 typehints_use_rtype = False
+typehints_formatter = typehints_formatter_for('chexus')
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

@@ -7,10 +7,19 @@ import h5py
 from .tree import Dataset, Group
 
 
-def read_hdf5(path: str, skip=None) -> Group:
+def read_hdf5(path: str, skip: list[str] | None=None, root: list[str] | None = None) -> Group:
     """Read HDF5 file and return tree of datasets and groups"""
     with h5py.File(path, "r") as f:
-        return _read_group(f, skip=skip)
+        group = Group(name=f.name, attrs=_read_attrs(f), parent=None)
+        if root is not None:
+            # handled separately in case root includes path information
+            group.children = {n: _read_group(f[n], parent=group) for n in root}
+        elif skip is not None:
+            names = [name for name in f.keys() if name not in skip]
+            group.children = {n: _read_group(f[n], parent=group) for n in names}
+        else:
+            group.children = {n: _read_group(v, parent=group) for n, v in f.items()}
+        return group
 
 
 def _read_attrs(node: h5py.Dataset | h5py.Group) -> dict[str, Any]:
@@ -23,16 +32,14 @@ def _read_attrs(node: h5py.Dataset | h5py.Group) -> dict[str, Any]:
     return attrs
 
 
-def _read_group(group: h5py.File | h5py.Group, parent: Group | None = None, skip: list[str] | None = None) -> Group:
+def _read_group(group: h5py.File | h5py.Group, parent: Group | None = None) -> Group:
     """Read HDF5 group"""
     grp = Group(name=group.name, attrs=_read_attrs(group), children={}, parent=parent)
     for name, value in group.items():
-        if skip is not None and name in skip:
-            pass
-        elif isinstance(value, h5py.Dataset):
+        if isinstance(value, h5py.Dataset):
             grp.children[name] = _read_dataset(value, parent=grp)
         elif isinstance(value, h5py.Group):
-            grp.children[name] = _read_group(value, parent=grp, skip=skip)
+            grp.children[name] = _read_group(value, parent=grp)
         else:
             raise ValueError(f"Unsupported type: {type(value)}")
     return grp

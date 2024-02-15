@@ -8,7 +8,7 @@ import numpy as np
 from .tree import Dataset, Group
 
 
-def read_json(path: str, skip: list[str] | None = None) -> Group:
+def read_json(path: str, skip: list[str] | None = None, root: list[str] | None = None) -> Group:
     """
     Read JSON NeXus file and return tree of datasets and groups.
 
@@ -52,11 +52,23 @@ def read_json(path: str, skip: list[str] | None = None) -> Group:
         ]
     },
     """
+    if root is None:
+        root = []
+    if any('/' in r for r in root):
+        raise ValueError('JSON parsing can only filter root-level groups (no path separators allowed)')
+    if skip is None:
+        skip = []
     with open(path, "r") as f:
-        return _read_group(json.load(f), skip=skip)
+        top = json.load(f)
+        keys = list(top.keys())
+        if len(root):
+            keys = [k for k in keys if k in root]
+        if len(skip):
+            keys = [k for k in keys if k not in skip]
+        return _read_group({k: top[k] for k in keys})
 
 
-def _read_group(group: dict[str, Any], parent: Group | None = None, skip: list[str] | None = None) -> Group:
+def _read_group(group: dict[str, Any], parent: Group | None = None) -> Group:
     """Read JSON group"""
     name = group.get("name", '')
     if parent is not None:
@@ -67,9 +79,9 @@ def _read_group(group: dict[str, Any], parent: Group | None = None, skip: list[s
             continue
         module = child.get("module")
         if module is None:
-            if child["type"] == "group" and (skip is None or child["name"] not in skip):
-                grp.children[child["name"]] = _read_group(child, parent=grp, skip=skip)
-        elif module == "dataset" and (skip is None or child["config"]["name"] not in skip):
+            if child["type"] == "group":
+                grp.children[child["name"]] = _read_group(child, parent=grp)
+        elif module == "dataset":
             grp.children[child["config"]["name"]] = _read_dataset(child, parent=grp)
         elif module in ["f142", 'f144']:
             grp.children[child["config"]["source"]] = _read_source(child, parent=grp)

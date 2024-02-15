@@ -27,12 +27,15 @@ def main():
         help='Skip the validators that have missing dependecies',
     )
     parser.add_argument('--skip', '-S', action='append',
-                        help='Skip groups and datasets with name matching any provided SKIP', required=False)
+                        help='Skip top-level groups with name matching any provided SKIP', required=False)
+    parser.add_argument('--root', '-R', action='append',
+                        help='Root group(s) for checking', required=False)
     parser.add_argument('path', help='Input file')
     args = parser.parse_args()
     path = args.path
     ignore_missing = args.ignore_missing
     skip = args.skip
+    root = args.root
 
     has_scipp = False
     try:
@@ -51,7 +54,7 @@ def main():
     else:
         has_scipp = True
 
-    group = chexus.read_json(path, skip=skip) if _is_text_file(path) else chexus.read_hdf5(path, skip=skip)
+    group = chexus.read_json(path, skip=skip, root=root) if _is_text_file(path) else chexus.read_hdf5(path, skip=skip, root=root)
 
     validators = chexus.validators.base_validators(has_scipp=has_scipp)
     results = chexus.validate(group, validators=validators)

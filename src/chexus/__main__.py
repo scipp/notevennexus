@@ -95,7 +95,10 @@ def main():
         help='Skip the validators that have missing dependecies',
     )
     parser.add_argument(
-        '--root-path', help='Path to the top-level group to validate', default='/'
+        '-r',
+        '--root-groups',
+        help='Path to the top-level group to validate',
+        default='/',
     )
     parser.add_argument('path', help='Input file')
 
@@ -121,7 +124,7 @@ def main():
         has_scipp = True
 
     group = chexus.read_json(path) if _is_text_file(path) else chexus.read_hdf5(path)
-    root_group = _find_root_group(group, args.root_path)
+    root_group = _find_root_group(group, args.root_groups)
     parent = _prune_siblings(root_group)
     target_group = root_group if parent is None else parent
 

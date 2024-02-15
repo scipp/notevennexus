@@ -32,24 +32,25 @@ def _path_to_keys(path: str) -> list[str]:
     ['entry1']
     """
     if path in ['', '/']:
-
         return []
 
     return path.removeprefix('/').removesuffix('/').split('/')
 
 
-def _retrieve_item(nested_obj: chexus.Group | chexus.Dataset, *keys: str, _visited: str = '') -> chexus.Group | chexus.Dataset:
+def _retrieve_item(
+    nested_obj: chexus.Group | chexus.Dataset, *keys: str, _visited: str = ''
+) -> chexus.Group | chexus.Dataset:
     """Retrieve an item from a nested group using a list of keys."""
     if len(keys) == 0:
-
         return nested_obj
-    
+
     cur_key, next_keys = keys[0], keys[1:]
     if not isinstance(nested_obj, chexus.Group) or not (cur_key in nested_obj.children):
-
         raise KeyError(f"{_visited}/{cur_key} not found.")
 
-    return _retrieve_item(nested_obj.children[cur_key], *next_keys, _visited='/'.join((_visited, cur_key)))
+    return _retrieve_item(
+        nested_obj.children[cur_key], *next_keys, _visited='/'.join((_visited, cur_key))
+    )
 
 
 def _find_root_group(group: chexus.Group, root_path: str) -> chexus.Group:
@@ -60,18 +61,15 @@ def _find_root_group(group: chexus.Group, root_path: str) -> chexus.Group:
     keys = _path_to_keys(root_path)
 
     if not isinstance((candidate := _retrieve_item(group, *keys)), chexus.Group):
-
         raise ValueError(f"{root_path} is not a group.")
-    
+
     return candidate
 
 
 def _prune_siblings(root_child: chexus.Group) -> chexus.Group | None:
-    """Return a new group with ``root_child`` as an only child.
-    
-    """
-    
-    if (parent:=root_child.parent) is None:
+    """Return a new group with ``root_child`` as an only child."""
+
+    if (parent := root_child.parent) is None:
         return
 
     return chexus.Group(
@@ -82,8 +80,9 @@ def _prune_siblings(root_child: chexus.Group) -> chexus.Group | None:
             for name, child in parent.children.items()
             if child is root_child
         },
-        parent=parent.parent
+        parent=parent.parent,
     )
+
 
 def main():
     parser = argparse.ArgumentParser(description='Validate NeXus files.')
@@ -96,9 +95,7 @@ def main():
         help='Skip the validators that have missing dependecies',
     )
     parser.add_argument(
-        '--root-path',
-        help='Path to the top-level group to validate',
-        default='/'
+        '--root-path', help='Path to the top-level group to validate', default='/'
     )
     parser.add_argument('path', help='Input file')
 
@@ -127,7 +124,7 @@ def main():
     root_group = _find_root_group(group, args.root_path)
     parent = _prune_siblings(root_group)
     target_group = root_group if parent is None else parent
-    
+
     validators = chexus.validators.base_validators(has_scipp=has_scipp)
     results = chexus.validate(target_group, validators=validators)
     print(chexus.report(results=results))

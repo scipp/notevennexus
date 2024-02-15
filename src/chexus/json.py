@@ -8,7 +8,7 @@ import numpy as np
 from .tree import Dataset, Group
 
 
-def read_json(path: str, skip: list[str] | None = None, root: list[str] | None = None) -> Group:
+def read_json(path: str) -> Group:
     """
     Read JSON NeXus file and return tree of datasets and groups.
 
@@ -52,20 +52,8 @@ def read_json(path: str, skip: list[str] | None = None, root: list[str] | None =
         ]
     },
     """
-    if root is None:
-        root = []
-    if any('/' in r for r in root):
-        raise ValueError('JSON parsing can only filter root-level groups (no path separators allowed)')
-    if skip is None:
-        skip = []
     with open(path, "r") as f:
-        top = json.load(f)
-        keys = list(top.keys())
-        if len(root):
-            keys = [k for k in keys if k in root]
-        if len(skip):
-            keys = [k for k in keys if k not in skip]
-        return _read_group({k: top[k] for k in keys})
+        return _read_group(json.load(f))
 
 
 def _read_group(group: dict[str, Any], parent: Group | None = None) -> Group:

@@ -7,19 +7,10 @@ import h5py
 from .tree import Dataset, Group
 
 
-def read_hdf5(path: str, skip: list[str] | None=None, root: list[str] | None = None) -> Group:
+def read_hdf5(path: str) -> Group:
     """Read HDF5 file and return tree of datasets and groups"""
     with h5py.File(path, "r") as f:
-        group = Group(name=f.name, attrs=_read_attrs(f), parent=None)
-        if root is not None:
-            # handled separately in case root includes path information
-            group.children = {n: _read_group(f[n], parent=group) for n in root}
-        elif skip is not None:
-            names = [name for name in f.keys() if name not in skip]
-            group.children = {n: _read_group(f[n], parent=group) for n in names}
-        else:
-            group.children = {n: _read_group(v, parent=group) for n, v in f.items()}
-        return group
+        return _read_group(f)
 
 
 def _read_attrs(node: h5py.Dataset | h5py.Group) -> dict[str, Any]:

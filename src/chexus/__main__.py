@@ -26,11 +26,11 @@ def main():
         action='store_true',
         help='Skip the validators that have missing dependecies',
     )
+    # Add argument to return bad exit code if validation fails
     parser.add_argument(
-        '-e',
-        '--exception',
+        '--exit-on-fail',
         action='store_true',
-        help='Raise an exception if validation fails',
+        help='Return a non-zero exit code if validation fails',
     )
     parser.add_argument('path', help='Input file')
     args = parser.parse_args()
@@ -62,8 +62,9 @@ def main():
     print(chexus.make_fileinfo(path))
     if args.checksums:
         print(chexus.compute_checksum(path))
-    if args.exception and chexus.has_violations(results):
-        raise ValueError('Validation failed')
+    if args.exit_on_fail and chexus.has_violations(results):
+        print('Validation has failed')
+        sys.exit(1)
 
 
 if __name__ == '__main__':

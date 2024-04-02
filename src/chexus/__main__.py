@@ -26,6 +26,12 @@ def main():
         action='store_true',
         help='Skip the validators that have missing dependecies',
     )
+    parser.add_argument(
+        '-e',
+        '--exception',
+        action='store_true',
+        help='Raise an exception if validation fails',
+    )
     parser.add_argument('path', help='Input file')
     args = parser.parse_args()
     path = args.path
@@ -56,6 +62,8 @@ def main():
     print(chexus.make_fileinfo(path))
     if args.checksums:
         print(chexus.compute_checksum(path))
+    if args.exception and chexus.has_violations(results):
+        raise ValueError('Validation failed')
 
 
 if __name__ == '__main__':

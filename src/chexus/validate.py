@@ -81,3 +81,7 @@ def report(results: dict[type, ValidationResult]) -> str:
     summary += '\n'
     summary += f"Total: {total_violations}/{total_checks}"
     return f'{details}\n\n{summary}'
+
+
+def has_violations(results: dict[type, ValidationResult]) -> bool:
+    return any(result.fails for result in results.values())

@@ -19,6 +19,7 @@ test:
     - chexus
   requires:
     - pytest
+    - scipp
   source_files:
     - pyproject.toml
     - tests/

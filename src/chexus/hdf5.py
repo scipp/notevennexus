@@ -7,9 +7,9 @@ import h5py
 from .tree import Dataset, Group
 
 
-def read_hdf5(path: str) -> Group:
+def read_hdf5(path: str, **kwargs) -> Group:
     """Read HDF5 file and return tree of datasets and groups"""
-    with h5py.File(path, "r") as f:
+    with h5py.File(path, "r", **kwargs) as f:
         return _read_group(f)
 
 

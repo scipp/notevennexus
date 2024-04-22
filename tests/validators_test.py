@@ -272,6 +272,35 @@ def test_units_invalid(units: str):
 
 
 @pytest.mark.parametrize(
+    'units, valid',
+    [
+        ('m', True),
+        ('', True),
+        ('test', False),
+        ('seco', False),
+        ('1/year', True),
+        ('Hz/ms', True),
+    ],
+)
+def test_float_dataset_units_check(units: str, valid: bool):
+    dataset = chexus.Dataset(
+        name='x',
+        value=1.0,
+        shape=None,
+        dtype=np.float64,
+        parent=None,
+        attrs={'units': units},
+    )
+    assert chexus.validators.float_dataset_units_check().applies_to(dataset)
+    result = chexus.validators.float_dataset_units_check().validate(dataset)
+    if valid:
+        assert result is None
+    else:
+        assert isinstance(result, chexus.Violation)
+        assert result.name == 'x'
+
+
+@pytest.mark.parametrize(
     'units, good',
     [
         ('hz', False),

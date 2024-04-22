@@ -50,6 +50,7 @@ minversion = "7.0"
 addopts = """
 --strict-config
 --strict-markers
+--import-mode=importlib
 -ra
 -v
 """
@@ -78,5 +79,4 @@ enable_error_code = [
     "redundant-expr",
     "truthy-bool",
 ]
-show_error_codes = true
 warn_unreachable = true

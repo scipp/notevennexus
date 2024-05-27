@@ -154,6 +154,25 @@ class float_dataset_units_missing(Validator):
             return Violation(node.name)
 
 
+class dataset_units_check(Validator):
+    def __init__(self) -> None:
+        super().__init__(
+            "dataset_units_check",
+            "Dataset should have units parasable by scipp",
+        )
+
+    def applies_to(self, node: Dataset | Group) -> bool:
+        return isinstance(node, Dataset) and 'units' in node.attrs
+
+    def validate(self, node: Dataset | Group) -> Violation | None:
+        import scipp as sc
+
+        try:
+            sc.Unit(node.attrs['units'])
+        except sc.UnitError:
+            return Violation(node.name)
+
+
 class non_numeric_dataset_has_units(Validator):
     def __init__(self) -> None:
         super().__init__(
@@ -306,5 +325,6 @@ def base_validators(*, has_scipp=True):
     if has_scipp:
         validators += [
             chopper_frequency_units_invalid(),
+            dataset_units_check(),
         ]
     return validators

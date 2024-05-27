@@ -272,6 +272,43 @@ def test_units_invalid(units: str):
 
 
 @pytest.mark.parametrize(
+    "units",
+    ["m", "", "1/year", "Hz/ms"],
+)
+def test_dataset_units_check_valid(units: str):
+    dataset = chexus.Dataset(
+        name="x",
+        value=1.0,
+        shape=None,
+        dtype=np.float64,
+        parent=None,
+        attrs={"units": units},
+    )
+    assert chexus.validators.dataset_units_check().applies_to(dataset)
+    result = chexus.validators.dataset_units_check().validate(dataset)
+    assert result is None
+
+
+@pytest.mark.parametrize(
+    "units",
+    ["test", "seco"],
+)
+def test_dataset_units_check_not_valid(units: str):
+    dataset = chexus.Dataset(
+        name="x",
+        value=1.0,
+        shape=None,
+        dtype=np.float64,
+        parent=None,
+        attrs={"units": units},
+    )
+    assert chexus.validators.dataset_units_check().applies_to(dataset)
+    result = chexus.validators.dataset_units_check().validate(dataset)
+    assert isinstance(result, chexus.Violation)
+    assert result.name == "x"
+
+
+@pytest.mark.parametrize(
     'units, good',
     [
         ('hz', False),

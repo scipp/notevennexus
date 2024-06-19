@@ -243,14 +243,17 @@ class chopper_frequency_units_invalid(Validator):
     def validate(self, node: Dataset | Group) -> Violation | None:
         import scipp as sc
 
-        if 'units' in node.children.get('rotation_speed').attrs:
-            unit = node.children.get('rotation_speed').attrs.get('units')
-            try:
-                sc.scalar(1, unit=unit).to(unit='Hz')
-            except sc.UnitError:
-                pass
-            else:
-                return
+        rotation_speed = node.children.get('rotation_speed')
+        if 'NXlog' == rotation_speed.attrs.get('NX_class'):
+            unit = rotation_speed.children.get('value').attrs.get('units')
+        else:
+            unit = rotation_speed.attrs.get('units')
+        try:
+            sc.scalar(1, unit=unit).to(unit='Hz')
+        except sc.UnitError:
+            pass
+        else:
+            return
         return Violation(node.name)
 
 

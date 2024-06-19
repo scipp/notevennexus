@@ -340,3 +340,41 @@ def test_NXdisk_chopper_units(units: str, good: bool):
     else:
         assert isinstance(result, chexus.Violation)
         assert result.name == 'x'
+
+
+@pytest.mark.parametrize(
+    'units, good',
+    [
+        ('hz', False),
+        ('', False),
+        ('m/s', False),
+        ('1/year', True),
+        ('Hz', True),
+        ('MHz', True),
+        ('1/ms', True),
+    ],
+)
+def test_NXdisk_chopper_units_log(units: str, good: bool):
+    group = chexus.Group(
+        name='x',
+        attrs={'NX_class': 'NXdisk_chopper'},
+    )
+    group.children['rotation_speed'] = chexus.Group(
+        name='x/rotation_speed',
+        attrs={'NX_class': 'NXlog'},
+    )
+    group.children['rotation_speed'].children['value'] = chexus.Dataset(
+        name='x/rotation_speed/value',
+        value=1.0,
+        shape=None,
+        dtype=float,
+        parent=group.children['rotation_speed'],
+        attrs={'units': units},
+    )
+    assert chexus.validators.chopper_frequency_units_invalid().applies_to(group)
+    result = chexus.validators.chopper_frequency_units_invalid().validate(group)
+    if good:
+        assert result is None
+    else:
+        assert isinstance(result, chexus.Violation)
+        assert result.name == 'x'

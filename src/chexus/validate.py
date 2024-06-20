@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from typing import Callable
 
 from .tree import Dataset, Group, unroll_tree
 
@@ -59,10 +60,16 @@ class ValidationResult:
         return f"{self.validator.name}: {self.fails}/{self.checks}\n"
 
 
-def validate(group: Group, validators: list[Validator]) -> dict[type, ValidationResult]:
+def validate(
+    group: Group,
+    validators: list[Validator],
+    skip_condition: Callable[Group | Dataset, bool],
+) -> dict[type, ValidationResult]:
     tree = unroll_tree(group)
     results = {type(v): ValidationResult(v) for v in validators}
     for node in tree.values():
+        if skip_condition(node):
+            continue
         for validation in results.values():
             validation.apply(node)
     return results

@@ -35,6 +35,7 @@ def main():
     parser.add_argument(
         '-r',
         '--root-path',
+        type=lambda s: s if s.startswith('/') else '/' + s,
         help='Path to the top-level group to validate',
         default='',
     )

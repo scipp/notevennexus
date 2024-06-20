@@ -63,7 +63,7 @@ class ValidationResult:
 def validate(
     group: Group,
     validators: list[Validator],
-    skip_condition: Callable[Group | Dataset, bool],
+    skip_condition: Callable[Group | Dataset, bool] = lambda n: False,
 ) -> dict[type, ValidationResult]:
     tree = unroll_tree(group)
     results = {type(v): ValidationResult(v) for v in validators}

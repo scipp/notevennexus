@@ -32,6 +32,13 @@ def main():
         action='store_true',
         help='Return a non-zero exit code if validation fails',
     )
+    parser.add_argument(
+        '-r',
+        '--root-path',
+        type=lambda s: s if s.startswith('/') else '/' + s,
+        help='Path to the top-level group to validate',
+        default='',
+    )
     parser.add_argument('path', help='Input file')
     args = parser.parse_args()
     path = args.path
@@ -57,7 +64,13 @@ def main():
     group = chexus.read_json(path) if _is_text_file(path) else chexus.read_hdf5(path)
 
     validators = chexus.validators.base_validators(has_scipp=has_scipp)
-    results = chexus.validate(group, validators=validators)
+
+    def skip_condition(node):
+        return not node.name.startswith(args.root_path)
+
+    results = chexus.validate(
+        group, validators=validators, skip_condition=skip_condition
+    )
     print(chexus.report(results=results))
     print(chexus.make_fileinfo(path))
     if args.checksums:

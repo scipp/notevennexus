@@ -378,3 +378,61 @@ def test_NXdisk_chopper_units_log(units: str, good: bool):
     else:
         assert isinstance(result, chexus.Violation)
         assert result.name == 'x'
+
+
+def test_NXlog_has_value():
+    good = chexus.Group(
+        name='x',
+        parent=None,
+        attrs={'NX_class': 'NXlog'},
+        children={},
+    )
+    good.children['time'] = chexus.Dataset(
+        name='x/time', value=3.0, shape=None, dtype=int, parent=good
+    )
+    good.children['value'] = chexus.Dataset(
+        name='x/value', value=1.0, shape=None, dtype=float, parent=good
+    )
+    assert chexus.validators.NXlog_has_value().validate(good) is None
+
+    bad = chexus.Group(
+        name='x',
+        parent=None,
+        attrs={'NX_class': 'NXlog'},
+        children={},
+    )
+    bad.children['time'] = chexus.Dataset(
+        name='x/time', value=3.0, shape=None, dtype=int, parent=good
+    )
+    result = chexus.validators.float_dataset_units_missing().validate(bad)
+    assert isinstance(result, chexus.Violation)
+    assert result.name == 'x'
+
+
+def test_NXlog_top_dead_center_has_no_value():
+    good = chexus.Group(
+        name='top_dead_center',
+        parent=None,
+        attrs={'NX_class': 'NXlog'},
+        children={},
+    )
+    good.children['time'] = chexus.Dataset(
+        name='top_dead_center/time', value=3.0, shape=None, dtype=int, parent=good
+    )
+    assert chexus.validators.NXlog_has_value().validate(good) is None
+
+    bad = chexus.Group(
+        name='top_dead_center',
+        parent=None,
+        attrs={'NX_class': 'NXlog'},
+        children={},
+    )
+    bad.children['time'] = chexus.Dataset(
+        name='top_dead_center/time', value=3.0, shape=None, dtype=int, parent=good
+    )
+    bad.children['value'] = chexus.Dataset(
+        name='top_dead_center/value', value=1.0, shape=None, dtype=float, parent=bad
+    )
+    result = chexus.validators.float_dataset_units_missing().validate(bad)
+    assert isinstance(result, chexus.Violation)
+    assert result.name == 'top_dead_center'

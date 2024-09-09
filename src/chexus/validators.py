@@ -310,6 +310,27 @@ class depends_on_missing(Validator):
             return Violation(node.name)
 
 
+class NXlog_has_value(Validator):
+    def __init__(self) -> None:
+        super().__init__(
+            "NXlog_has_value",
+            "NXlogs must have a value field except for top_dead_center",
+        )
+
+    def applies_to(self, node: Dataset | Group) -> bool:
+        return isinstance(node, Group) and node.attrs.get('NX_class') == 'NXlog'
+
+    def validate(self, node: Dataset | Group) -> Violation | None:
+        if node.name == 'top_dead_center':
+            if 'value' in node.children:
+                return Violation(
+                    node.name, 'top_dead_center logs must not have a value'
+                )
+        else:
+            if 'value' not in node.children:
+                return Violation(node.name, 'NXlog must have a value')
+
+
 def base_validators(*, has_scipp=True):
     validators = [
         depends_on_missing(),
@@ -324,6 +345,7 @@ def base_validators(*, has_scipp=True):
         transformation_depends_on_missing(),
         transformation_offset_units_missing(),
         units_invalid(),
+        NXlog_has_value(),
     ]
     if has_scipp:
         validators += [

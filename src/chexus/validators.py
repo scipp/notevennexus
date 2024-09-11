@@ -26,24 +26,24 @@ class depends_on_target_missing(Validator):
         )
 
     def applies_to(self, node: Dataset | Group) -> bool:
-        return node.name.endswith('/depends_on') or "depends_on" in node.attrs
+        return node.name.endswith("/depends_on") or "depends_on" in node.attrs
 
     def validate(self, node: Dataset | Group) -> Violation | None:
-        if node.name.endswith('/depends_on'):
+        if node.name.endswith("/depends_on"):
             target = node.value
         else:
             target = node.attrs["depends_on"]
-        if target == '.':
+        if target == ".":
             return None
         if not isinstance(target, str):
             return Violation(node.name, f"depends_on target {target} is not a string")
-        path = target.split('/')
-        if path[0] == '':
+        path = target.split("/")
+        if path[0] == "":
             start = self._find_root(node)
             path = path[1:]
         else:
             start = node.parent
-        if path[0] == '.':
+        if path[0] == ".":
             path = path[1:]
         for name in path:
             if name not in start.children:
@@ -69,7 +69,7 @@ class NX_class_is_legacy(Validator):
 
     def validate(self, node: Dataset | Group) -> Violation | None:
         nx_class = node.attrs.get("NX_class")
-        if nx_class in ['NXgeometry', 'NXorientation', 'NXshape', 'NXtranslation']:
+        if nx_class in ["NXgeometry", "NXorientation", "NXshape", "NXtranslation"]:
             return Violation(node.name, f"NX_class {nx_class} is deprecated")
 
 
@@ -81,7 +81,7 @@ class group_has_units(Validator):
         return isinstance(node, Group)
 
     def validate(self, node: Dataset | Group) -> Violation | None:
-        if 'units' in node.attrs:
+        if "units" in node.attrs:
             return Violation(node.name)
 
 
@@ -90,15 +90,15 @@ class units_invalid(Validator):
         super().__init__("units_invalid", "Invalid units attribute")
 
     def applies_to(self, node: Dataset | Group) -> bool:
-        return isinstance(node, Dataset) and 'units' in node.attrs
+        return isinstance(node, Dataset) and "units" in node.attrs
 
     def validate(self, node: Dataset | Group) -> Violation | None:
-        units = node.attrs['units']
-        invalid = ['hz']
+        units = node.attrs["units"]
+        invalid = ["hz"]
         if not isinstance(units, str):
-            return Violation(node.name, f'Invalid units type {type(units)}')
+            return Violation(node.name, f"Invalid units type {type(units)}")
         # Units starting with NX_ are likely placeholders from the NeXus standard
-        if units.startswith('NX_') or units in invalid:
+        if units.startswith("NX_") or units in invalid:
             return Violation(node.name, f"Invalid units {units}")
 
 
@@ -110,21 +110,21 @@ class index_has_units(Validator):
 
     def applies_to(self, node: Dataset | Group) -> bool:
         names = [
-            'cue_index',
-            'cylinders',
-            'detector_faces',
-            'detector_number',
-            'event_id',
-            'event_index',
-            'faces',
-            'image_key',
-            'winding_order',
+            "cue_index",
+            "cylinders",
+            "detector_faces",
+            "detector_number",
+            "event_id",
+            "event_index",
+            "faces",
+            "image_key",
+            "winding_order",
         ]
-        name = node.name.split('/')[-1]
+        name = node.name.split("/")[-1]
         return isinstance(node, Dataset) and name in names
 
     def validate(self, node: Dataset | Group) -> Violation | None:
-        if 'units' in node.attrs:
+        if "units" in node.attrs:
             return Violation(node.name)
 
 
@@ -133,10 +133,10 @@ class mask_has_units(Validator):
         super().__init__("mask_has_units", "Mask should not have units attribute")
 
     def applies_to(self, node: Dataset | Group) -> bool:
-        return isinstance(node, Dataset) and node.name.startswith('pixel_mask')
+        return isinstance(node, Dataset) and node.name.startswith("pixel_mask")
 
     def validate(self, node: Dataset | Group) -> Violation | None:
-        if 'units' in node.attrs:
+        if "units" in node.attrs:
             return Violation(node.name)
 
 
@@ -150,7 +150,7 @@ class float_dataset_units_missing(Validator):
         return isinstance(node, Dataset) and node.dtype in [np.float32, np.float64]
 
     def validate(self, node: Dataset | Group) -> Violation | None:
-        if 'units' not in node.attrs:
+        if "units" not in node.attrs:
             return Violation(node.name)
 
 
@@ -162,13 +162,13 @@ class dataset_units_check(Validator):
         )
 
     def applies_to(self, node: Dataset | Group) -> bool:
-        return isinstance(node, Dataset) and 'units' in node.attrs
+        return isinstance(node, Dataset) and "units" in node.attrs
 
     def validate(self, node: Dataset | Group) -> Violation | None:
         import scipp as sc
 
         try:
-            sc.Unit(node.attrs['units'])
+            sc.Unit(node.attrs["units"])
         except sc.UnitError:
             return Violation(node.name)
 
@@ -184,12 +184,12 @@ class non_numeric_dataset_has_units(Validator):
         return isinstance(node, Dataset) and not np.issubdtype(node.dtype, np.number)
 
     def validate(self, node: Dataset | Group) -> Violation | None:
-        if 'units' in node.attrs:
+        if "units" in node.attrs:
             return Violation(node.name)
 
 
 def is_transformation(node: Dataset | Group) -> bool:
-    return 'transformation_type' in node.attrs and 'vector' in node.attrs
+    return "transformation_type" in node.attrs and "vector" in node.attrs
 
 
 class transformation_offset_units_missing(Validator):
@@ -203,11 +203,11 @@ class transformation_offset_units_missing(Validator):
         return (
             isinstance(node, Dataset)
             and is_transformation(node)
-            and 'offset' in node.attrs
+            and "offset" in node.attrs
         )
 
     def validate(self, node: Dataset | Group) -> Violation | None:
-        if 'offset_units' not in node.attrs:
+        if "offset_units" not in node.attrs:
             return Violation(node.name)
 
 
@@ -222,7 +222,7 @@ class transformation_depends_on_missing(Validator):
         return isinstance(node, Dataset) and is_transformation(node)
 
     def validate(self, node: Dataset | Group) -> Violation | None:
-        if 'depends_on' not in node.attrs:
+        if "depends_on" not in node.attrs:
             return Violation(node.name)
 
 
@@ -236,20 +236,20 @@ class chopper_frequency_units_invalid(Validator):
     def applies_to(self, node: Dataset | Group) -> bool:
         return (
             isinstance(node, Group)
-            and node.attrs.get('NX_class') == 'NXdisk_chopper'
-            and 'rotation_speed' in node.children
+            and node.attrs.get("NX_class") == "NXdisk_chopper"
+            and "rotation_speed" in node.children
         )
 
     def validate(self, node: Dataset | Group) -> Violation | None:
         import scipp as sc
 
-        rotation_speed = node.children.get('rotation_speed')
-        if 'NXlog' == rotation_speed.attrs.get('NX_class'):
-            unit = rotation_speed.children.get('value').attrs.get('units')
+        rotation_speed = node.children.get("rotation_speed")
+        if "NXlog" == rotation_speed.attrs.get("NX_class"):
+            unit = rotation_speed.children.get("value").attrs.get("units")
         else:
-            unit = rotation_speed.attrs.get('units')
+            unit = rotation_speed.attrs.get("units")
         try:
-            sc.scalar(1, unit=unit).to(unit='Hz')
+            sc.scalar(1, unit=unit).to(unit="Hz")
         except sc.UnitError:
             pass
         else:
@@ -258,55 +258,55 @@ class chopper_frequency_units_invalid(Validator):
 
 
 physical_components = [
-    'NXaperture',
-    'NXattenuator',
-    'NXbeam',
-    'NXbeam_stop',
-    'NXbending_magnet',
-    'NXcapillary',
-    'NXcollimator',
-    'NXcrystal',
-    'NXdetector',
-    'NXdetector_module',
-    'NXdisk_chopper',
-    'NXfermi_chopper',
-    'NXfilter',
-    'NXflipper',
-    'NXfresnel_zone_plate',
-    'NXgrating',
-    'NXguide',
-    'NXinsertion_device',
-    'NXmirror',
-    'NXmoderator',
-    'NXmonitor',
-    'NXmonochromator',
-    'NXpinhole',
-    'NXpolarizer',
-    'NXpositioner',
-    'NXsample',
-    'NXsensor',
-    'NXslit',
-    'NXsource',
-    'NXvelocity_selector',
-    'NXxraylens',
+    "NXaperture",
+    "NXattenuator",
+    "NXbeam",
+    "NXbeam_stop",
+    "NXbending_magnet",
+    "NXcapillary",
+    "NXcollimator",
+    "NXcrystal",
+    "NXdetector",
+    "NXdetector_module",
+    "NXdisk_chopper",
+    "NXfermi_chopper",
+    "NXfilter",
+    "NXflipper",
+    "NXfresnel_zone_plate",
+    "NXgrating",
+    "NXguide",
+    "NXinsertion_device",
+    "NXmirror",
+    "NXmoderator",
+    "NXmonitor",
+    "NXmonochromator",
+    "NXpinhole",
+    "NXpolarizer",
+    "NXpositioner",
+    "NXsample",
+    "NXsensor",
+    "NXslit",
+    "NXsource",
+    "NXvelocity_selector",
+    "NXxraylens",
 ]
 
 
 class depends_on_missing(Validator):
     def __init__(self) -> None:
         super().__init__(
-            'depends_on_missing',
-            'Group describes a physical component but has no depends_on',
+            "depends_on_missing",
+            "Group describes a physical component but has no depends_on",
         )
 
     def applies_to(self, node: Dataset | Group) -> bool:
         if isinstance(node, Group):
-            if node.attrs.get('NX_class') in physical_components:
+            if node.attrs.get("NX_class") in physical_components:
                 return True
         return False
 
     def validate(self, node: Dataset | Group) -> Violation | None:
-        if 'depends_on' not in node.children:
+        if "depends_on" not in node.children:
             return Violation(node.name)
 
 
@@ -318,17 +318,17 @@ class NXlog_has_value(Validator):
         )
 
     def applies_to(self, node: Dataset | Group) -> bool:
-        return isinstance(node, Group) and node.attrs.get('NX_class') == 'NXlog'
+        return isinstance(node, Group) and node.attrs.get("NX_class") == "NXlog"
 
     def validate(self, node: Dataset | Group) -> Violation | None:
-        if node.name == 'top_dead_center':
-            if 'value' in node.children:
+        if node.name.rsplit("/", 1)[-1] == "top_dead_center":
+            if "value" in node.children:
                 return Violation(
-                    node.name, 'top_dead_center logs must not have a value'
+                    node.name, "top_dead_center logs must not have a value"
                 )
         else:
-            if 'value' not in node.children:
-                return Violation(node.name, 'NXlog must have a value')
+            if "value" not in node.children:
+                return Violation(node.name, "NXlog must have a value")
 
 
 def base_validators(*, has_scipp=True):

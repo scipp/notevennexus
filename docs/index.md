@@ -7,9 +7,18 @@
 
 ## Install
 
-```bash
+`````{tab-set}
+````{tab-item} pip
+```sh
 pip install chexus
 ```
+````
+````{tab-item} conda
+```sh
+conda install -c conda-forge -c scipp chexus
+```
+````
+`````
 
 ## Run
 
@@ -19,6 +28,26 @@ chexus <path-to-nexus-file>
 
 This supports HDF5 as well as some JSON format.
 There is also a Python API, but this is under construction and unstable.
+
+## Options
+
+> `--checksums`
+
+Compute and print checksums.
+
+
+> `--ignore-missing`
+
+Skip the validators that have missing dependecies.
+
+> `--exit-on-fail`
+
+Return a non-zero exit code if validation fails.
+
+> `-r`, `--root-path`
+
+Path to the top-level group to validate. Default is `''`.
+
 
 ```{toctree}
 ---

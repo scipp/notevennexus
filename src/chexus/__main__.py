@@ -9,7 +9,7 @@ import chexus
 def _is_text_file(path: str) -> bool:
     """Check if file is text file"""
     try:
-        with open(path, 'r') as f:
+        with open(path, "r") as f:
             f.readline()
         return True
     except UnicodeDecodeError:
@@ -17,29 +17,29 @@ def _is_text_file(path: str) -> bool:
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Validate NeXus files.')
+    parser = argparse.ArgumentParser(description="Validate NeXus files.")
     parser.add_argument(
-        '--checksums', action='store_true', help='Compute and print checksums'
+        "--checksums", action="store_true", help="Compute and print checksums"
     )
     parser.add_argument(
-        '--ignore-missing',
-        action='store_true',
-        help='Skip the validators that have missing dependecies',
+        "--ignore-missing",
+        action="store_true",
+        help="Skip the validators that have missing dependencies",
     )
     # Add argument to return bad exit code if validation fails
     parser.add_argument(
-        '--exit-on-fail',
-        action='store_true',
-        help='Return a non-zero exit code if validation fails',
+        "--exit-on-fail",
+        action="store_true",
+        help="Return a non-zero exit code if validation fails",
     )
     parser.add_argument(
-        '-r',
-        '--root-path',
-        type=lambda s: s if s.startswith('/') else '/' + s,
-        help='Path to the top-level group to validate',
-        default='',
+        "-r",
+        "--root-path",
+        type=lambda s: s if s.startswith("/") else "/" + s,
+        help="Path to the top-level group to validate",
+        default="",
     )
-    parser.add_argument('path', help='Input file')
+    parser.add_argument("path", help="Input file")
     args = parser.parse_args()
     path = args.path
     ignore_missing = args.ignore_missing
@@ -50,12 +50,12 @@ def main():
     except ModuleNotFoundError:
         if not ignore_missing:
             print(
-                'Error: Scipp was not found. The Nexus file validation was not run.\n'
-                'To run the full test suite you need to install scipp'
-                ' using `pip install scipp` or `conda install -c scipp scipp`.'
-                ' This is recommended.\n'
-                'To run only the tests that don\'t require scipp and ignore this'
-                ' error add the flag `--ignore-missing`.'
+                "Error: Scipp was not found. The Nexus file validation was not run.\n"
+                "To run the full test suite you need to install scipp"
+                " using `pip install scipp` or `conda install -c scipp scipp`."
+                " This is recommended.\n"
+                "To run only the tests that don't require scipp and ignore this"
+                " error add the flag `--ignore-missing`."
             )
             sys.exit(1)
     else:
@@ -76,9 +76,9 @@ def main():
     if args.checksums:
         print(chexus.compute_checksum(path))
     if args.exit_on_fail and chexus.has_violations(results):
-        print('Validation has failed')
+        print("Validation has failed")
         sys.exit(1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

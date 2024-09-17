@@ -46,7 +46,7 @@ There is also a Python API, but this is under construction and unstable.
 ## Options
 
 - `--checksums`: Compute and print checksums.
-- `--ignore-missing`: Skip the validators that have missing dependecies.
+- `--ignore-missing`: Skip the validators that have missing dependencies.
 - `--exit-on-fail`: Return a non-zero exit code if validation fails.
 - `-r`, `--root-path`: Path to the top-level group to validate. Default is `''`.
 

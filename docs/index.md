@@ -1,13 +1,13 @@
 :::{image} _static/logo.svg
 :class: only-light
-:alt: Plopp
+:alt: Chexus
 :width: 60%
 :align: center
 :::
 
 :::{image} _static/logo-dark.svg
 :class: only-dark
-:alt: Plopp
+:alt: Chexus
 :width: 60%
 :align: center
 :::

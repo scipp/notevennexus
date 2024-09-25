@@ -38,6 +38,12 @@ dynamic = ["version"]
 [project.scripts]
 chexus = "chexus.__main__:main"
 
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "scipp",
+]
+
 [project.urls]
 "Bug Tracker" = "https://github.com/scipp/chexus/issues"
 "Documentation" = "https://scipp.github.io/chexus"
@@ -59,17 +65,43 @@ filterwarnings = [
   "error",
 ]
 
-[tool.bandit]
-# Excluding tests because bandit doesn't like `assert`.
-exclude_dirs = ["docs/conf.py", "tests"]
+[tool.ruff]
+line-length = 88
+extend-include = ["*.ipynb"]
+extend-exclude = [
+    ".*", "__pycache__", "build", "dist", "install",
+]
 
-[tool.black]
-skip-string-normalization = true
+[tool.ruff.lint]
+# See https://docs.astral.sh/ruff/rules/
+select = ["B", "C4", "DTZ", "E", "F", "G", "I", "PERF", "PGH", "PT", "PYI", "RUF", "S", "T20", "UP", "W"]
+ignore = [
+    # Conflict with ruff format, see
+    # https://docs.astral.sh/ruff/formatter/#conflicting-lint-rules
+    "COM812", "COM819", "D206", "D300", "E111", "E114", "E117", "ISC001", "ISC002", "Q000", "Q001", "Q002", "Q003", "W191",
+]
+fixable = ["B010", "I001", "PT001"]
+isort.known-first-party = ["chexus"]
+pydocstyle.convention = "numpy"
 
-[tool.isort]
-skip_gitignore = true
-profile = "black"
-known_first_party = ["chexus"]
+[tool.ruff.lint.per-file-ignores]
+# those files have an increased risk of relying on import order
+"__init__.py" = ["I"]
+"tests/*" = [
+    "S101",  # asserts are fine in tests
+    "B018",  # 'useless expressions' are ok because some tests just check for exceptions
+]
+"*.ipynb" = [
+    "E501",  # longer lines are sometimes more readable
+    "F403",  # *-imports used with domain types
+    "F405",  # linter may fail to find names because of *-imports
+    "I",  # we don't collect imports at the top
+    "S101",  # asserts are used for demonstration and are safe in notebooks
+    "T201",  # printing is ok for demonstration purposes
+]
+
+[tool.ruff.format]
+quote-style = "preserve"
 
 [tool.mypy]
 strict = true
@@ -80,3 +112,11 @@ enable_error_code = [
     "truthy-bool",
 ]
 warn_unreachable = true
+
+[tool.codespell]
+ignore-words-list = [
+    # Codespell wants "socioeconomic" which seems to be the standard spelling.
+    # But we use the word in our code of conduct which is the contributor covenant.
+    # Let's not modify it if we don't have to.
+    "socio-economic",
+]

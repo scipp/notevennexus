@@ -309,7 +309,7 @@ def test_dataset_units_check_not_valid(units: str):
 
 
 @pytest.mark.parametrize(
-    "units, good",
+    ("units", "good"),
     [
         ("hz", False),
         ("", False),
@@ -343,7 +343,7 @@ def test_NXdisk_chopper_units(units: str, good: bool):
 
 
 @pytest.mark.parametrize(
-    "units, good",
+    ("units", "good"),
     [
         ("hz", False),
         ("", False),

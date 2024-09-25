@@ -26,8 +26,8 @@ def make_fileinfo(path: str) -> str:
     info = f"File: {path}\n"
     from datetime import datetime
 
-    info += f"Created: {datetime.fromtimestamp(os.path.getctime(path))}\n"
-    info += f"Modified: {datetime.fromtimestamp(os.path.getmtime(path))}\n"
+    info += f"Created: {datetime.fromtimestamp(os.path.getctime(path), tz=None)}\n"  # noqa: DTZ006
+    info += f"Modified: {datetime.fromtimestamp(os.path.getmtime(path), tz=None)}\n"  # noqa: DTZ006
     size = os.path.getsize(path)
     units = ["byte", "kByte", "MByte", "GByte", "TByte"]
     for unit in units:

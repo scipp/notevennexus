@@ -1,5 +1,5 @@
 # Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
-_commit: d91bf92
+_commit: a052529
 _src_path: gh:scipp/copier_template
 description: Validate and check NeXus files
 max_python: '3.12'

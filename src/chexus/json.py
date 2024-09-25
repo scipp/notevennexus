@@ -52,7 +52,7 @@ def read_json(path: str) -> Group:
         ]
     },
     """
-    with open(path, "r") as f:
+    with open(path) as f:
         return _read_group(json.load(f))
 
 

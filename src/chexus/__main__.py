@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # Copyright (c) 2023 Scipp contributors (https://github.com/scipp)
+# ruff: noqa: T201
 import argparse
 import sys
 
@@ -9,7 +10,7 @@ import chexus
 def _is_text_file(path: str) -> bool:
     """Check if file is text file"""
     try:
-        with open(path, "r") as f:
+        with open(path) as f:
             f.readline()
         return True
     except UnicodeDecodeError:

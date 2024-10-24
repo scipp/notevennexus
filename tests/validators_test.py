@@ -505,3 +505,54 @@ def test_duplicate_detector_number(value):
     assert validator.validate(det2) is None
     # Second time the same detector numbers are seen, we expect a violation
     assert validator.validate(det) is not None
+
+
+def test_event_id_not_in_detector_number():
+    det = chexus.Group(name="detector1", attrs={"NX_class": "NXdetector"})
+    det.children = {
+        'data_good': chexus.Group(
+            name="data_good", attrs={"NX_class": "NXevent_data"}, parent=det
+        ),
+        'data_bad': chexus.Group(
+            name="data_bad", attrs={"NX_class": "NXevent_data"}, parent=det
+        ),
+        'detector_number': chexus.Dataset(
+            name="detector_number", value=[1, 2, 3], shape=(3,), dtype=int, parent=det
+        ),
+    }
+    det.children['data_good'].children = {
+        'event_id': chexus.Dataset(
+            name='event_id',
+            value=[1, 2, 3],
+            shape=(3,),
+            dtype=int,
+            parent=det.children['data_good'],
+        )
+    }
+    det.children['data_bad'].children = {
+        'event_id': chexus.Dataset(
+            name='event_id',
+            value=[1, 4],
+            shape=(2,),
+            dtype=int,
+            parent=det.children['data_bad'],
+        )
+    }
+    assert chexus.validators.event_id_subset_of_detector_number().applies_to(
+        det.children['data_good']
+    )
+    assert chexus.validators.event_id_subset_of_detector_number().applies_to(
+        det.children['data_bad']
+    )
+    assert (
+        chexus.validators.event_id_subset_of_detector_number().validate(
+            det.children['data_good']
+        )
+        is None
+    )
+    assert (
+        chexus.validators.event_id_subset_of_detector_number().validate(
+            det.children['data_bad']
+        )
+        is not None
+    )

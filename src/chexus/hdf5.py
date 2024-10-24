@@ -48,5 +48,5 @@ def _read_dataset(dataset: h5py.Dataset, parent: Group) -> Dataset:
     try:
         ds.value = dataset.asstr()[()]
     except TypeError:
-        pass
+        ds.value = dataset[()]
     return ds

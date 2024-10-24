@@ -479,3 +479,17 @@ def test_NXlog_nested_top_dead_center_has_no_value():
     result = chexus.validators.float_dataset_units_missing().validate(bad)
     assert isinstance(result, chexus.Violation)
     assert result.name == "chopper/top_dead_center"
+
+
+def test_duplicate_detector_number():
+    det = chexus.Group(name="detector1", attrs={"NX_class": "NXdetector"})
+    det.children = {
+        'detector_number': chexus.Dataset(
+            name="detector_number", value=[1, 2, 3], shape=(3,), dtype=int, parent=det
+        )
+    }
+    assert chexus.validators.detector_numbers_unique_in_all_detectors().applies_to(det)
+    validator = chexus.validators.detector_numbers_unique_in_all_detectors()
+    assert validator.validate(det) is None
+    # Second time the same detector numbers are seen, we expect a violation
+    assert validator.validate(det) is not None

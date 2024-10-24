@@ -257,6 +257,33 @@ class chopper_frequency_units_invalid(Validator):
         return Violation(node.name)
 
 
+class detector_numbers_unique_in_all_detectors(Validator):
+    def __init__(self) -> None:
+        super().__init__(
+            "detector_numbers are not unique",
+            "The values in all detector_numbers fields in all "
+            "detectors should be unique.",
+        )
+        self._seen_detector_numbers = np.array([], dtype='int')
+
+    def applies_to(self, node: Dataset | Group) -> bool:
+        return (
+            isinstance(node, Group)
+            and node.attrs.get('NX_class') == 'NXdetector'
+            and 'detector_number' in node.children
+        )
+
+    def validate(self, node: Dataset | Group) -> Violation | None:
+        detector_numbers = node.children['detector_number'].value
+        if not hasattr(detector_numbers, '__len__') or not len(detector_numbers):
+            return
+        if np.isin(detector_numbers, self._seen_detector_numbers).any():
+            return Violation(node.name)
+        self._seen_detector_numbers = np.concatenate(
+            (self._seen_detector_numbers, detector_numbers)
+        )
+
+
 physical_components = [
     "NXaperture",
     "NXattenuator",
@@ -346,6 +373,7 @@ def base_validators(*, has_scipp=True):
         transformation_offset_units_missing(),
         units_invalid(),
         NXlog_has_value(),
+        detector_numbers_unique_in_all_detectors(),
     ]
     if has_scipp:
         validators += [

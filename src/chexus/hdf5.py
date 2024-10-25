@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # Copyright (c) 2023 Scipp contributors (https://github.com/scipp)
+from collections.abc import Iterator
 from typing import Any
 
 import h5py
@@ -7,7 +8,7 @@ import h5py
 from .tree import Dataset, Group
 
 
-def read_hdf5(path: str, **kwargs) -> Group:
+def read_hdf5(path: str, **kwargs) -> Iterator[Group]:
     """Read HDF5 file and return tree of datasets and groups"""
     with h5py.File(path, "r", **kwargs) as f:
         yield _read_group(f)

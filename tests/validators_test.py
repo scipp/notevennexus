@@ -488,8 +488,15 @@ def test_duplicate_detector_number():
             name="detector_number", value=[1, 2, 3], shape=(3,), dtype=int, parent=det
         )
     }
+    det2 = chexus.Group(name="detector2", attrs={"NX_class": "NXdetector"})
+    det2.children = {
+        'detector_number': chexus.Dataset(
+            name="detector_number", value=[4, 5, 6], shape=(3,), dtype=int, parent=det2
+        )
+    }
     assert chexus.validators.detector_numbers_unique_in_all_detectors().applies_to(det)
     validator = chexus.validators.detector_numbers_unique_in_all_detectors()
     assert validator.validate(det) is None
+    assert validator.validate(det2) is None
     # Second time the same detector numbers are seen, we expect a violation
     assert validator.validate(det) is not None

@@ -5,6 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
+import h5py
+
 
 @dataclass
 class Dataset:
@@ -16,6 +18,20 @@ class Dataset:
     parent: Group
     attrs: dict[str, Any] = field(default_factory=dict)
     value: Any | None = None
+    dataset: h5py.Dataset | None = None
+
+    @property
+    def value(self) -> Any | None:  # noqa: F811
+        if self.dataset is not None:
+            try:
+                return self.dataset.asstr()[()]
+            except TypeError:
+                return self.dataset[()]
+        return self._value
+
+    @value.setter
+    def value(self, value: Any | None):
+        self._value = value
 
 
 @dataclass

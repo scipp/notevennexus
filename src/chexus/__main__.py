@@ -62,7 +62,11 @@ def main():
     else:
         has_scipp = True
 
-    group = chexus.read_json(path) if _is_text_file(path) else chexus.read_hdf5(path)
+    if _is_text_file(path):
+        group = chexus.read_json(path)
+    else:
+        reader = chexus.read_hdf5(path)
+        group = next(reader)
 
     validators = chexus.validators.base_validators(has_scipp=has_scipp)
 

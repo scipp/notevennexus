@@ -481,11 +481,16 @@ def test_NXlog_nested_top_dead_center_has_no_value():
     assert result.name == "chopper/top_dead_center"
 
 
-def test_duplicate_detector_number():
+@pytest.mark.parametrize('value', [(1, 2, 3), np.array([1, 2, 3]), [[0, 1], [2, 3]]])
+def test_duplicate_detector_number(value):
     det = chexus.Group(name="detector1", attrs={"NX_class": "NXdetector"})
     det.children = {
         'detector_number': chexus.Dataset(
-            name="detector_number", value=[1, 2, 3], shape=(3,), dtype=int, parent=det
+            name="detector_number",
+            value=value,
+            shape=np.array(value).shape,
+            dtype=int,
+            parent=det,
         )
     }
     det2 = chexus.Group(name="detector2", attrs={"NX_class": "NXdetector"})

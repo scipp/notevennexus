@@ -274,7 +274,7 @@ class detector_numbers_unique_in_all_detectors(Validator):
         )
 
     def validate(self, node: Dataset | Group) -> Violation | None:
-        detector_numbers = node.children['detector_number'].value
+        detector_numbers = np.asarray(node.children['detector_number'].value).ravel()
         if not hasattr(detector_numbers, '__len__'):
             return
         if np.isin(detector_numbers, self._seen_detector_numbers).any():

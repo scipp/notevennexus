@@ -7,6 +7,8 @@ from typing import Any
 
 import h5py
 
+_no_value_set = object()
+
 
 @dataclass
 class Dataset:
@@ -17,20 +19,34 @@ class Dataset:
     dtype: str
     parent: Group
     attrs: dict[str, Any] = field(default_factory=dict)
-    value: Any | None = None
+    value: Any = _no_value_set
     dataset: h5py.Dataset | None = None
 
     @property
     def value(self) -> Any | None:  # noqa: F811
+        '''Returns the value of the dataset.
+        If the value attribute has been set by the user
+        that value is returned.
+        Otherwise, if the dataset has access to a h5py dataset
+        the value in that dataset will be returned.
+        If no value was set and the object has no h5py dataset
+        then None is returned.
+        '''
+        if self._value is not _no_value_set:
+            return self._value
         if self.dataset is not None:
+            # We don't want to cache the values
+            # by saving them in the _value attribute.
+            # The reason is that we don't want to
+            # run out of memory if the file is large.
             try:
                 return self.dataset.asstr()[()]
             except TypeError:
                 return self.dataset[()]
-        return self._value
+        return None
 
     @value.setter
-    def value(self, value: Any | None):
+    def value(self, value: Any):
         self._value = value
 
 

@@ -65,7 +65,8 @@ def main():
     if _is_text_file(path):
         group = chexus.read_json(path)
     else:
-        # File is closed when 'reader' goes out of scope
+        # File is closed when 'reader' goes out of scope.
+        # We need to keep it open for lazily loading values.
         reader = chexus.read_hdf5(path)
         group = next(reader)
 

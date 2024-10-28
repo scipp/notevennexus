@@ -244,10 +244,15 @@ class chopper_frequency_units_invalid(Validator):
         import scipp as sc
 
         rotation_speed = node.children.get("rotation_speed")
-        if "NXlog" == rotation_speed.attrs.get("NX_class"):
-            unit = rotation_speed.children.get("value").attrs.get("units")
-        else:
+        if (
+            "NXlog" == rotation_speed.attrs.get("NX_class")
+            and "value" in rotation_speed.children
+        ):
+            unit = rotation_speed.children["value"].attrs.get("units")
+        elif "NXlog" != rotation_speed.attrs.get("NX_class"):
             unit = rotation_speed.attrs.get("units")
+        else:
+            return
         try:
             sc.scalar(1, unit=unit).to(unit="Hz")
         except sc.UnitError:

@@ -19,7 +19,7 @@ class Dataset:
     dtype: str
     parent: Group
     attrs: dict[str, Any] = field(default_factory=dict)
-    value: Any = _no_value_set
+    value: Any | None = None
     dataset: h5py.Dataset | None = None
 
     @property
@@ -47,7 +47,14 @@ class Dataset:
 
     @value.setter
     def value(self, value: Any):
-        self._value = value
+        # When the dataclass object is created
+        # the setter will be called with
+        # an instance of type property.
+        # Set _value to uninitialized in that case.
+        if isinstance(value, property):
+            self._value = _no_value_set
+        else:
+            self._value = value
 
 
 @dataclass

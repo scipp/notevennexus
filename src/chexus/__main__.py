@@ -62,7 +62,13 @@ def main():
     else:
         has_scipp = True
 
-    group = chexus.read_json(path) if _is_text_file(path) else chexus.read_hdf5(path)
+    if _is_text_file(path):
+        group = chexus.read_json(path)
+    else:
+        # File is closed when 'reader' goes out of scope.
+        # We need to keep it open for lazily loading values.
+        reader = chexus.read_hdf5(path)
+        group = next(reader)
 
     validators = chexus.validators.base_validators(has_scipp=has_scipp)
 

@@ -284,6 +284,31 @@ class detector_numbers_unique_in_all_detectors(Validator):
         )
 
 
+class event_id_subset_of_detector_number(Validator):
+    def __init__(self) -> None:
+        super().__init__(
+            "event_id is not subset of associated detector_numbers",
+            "The values in the event_id field in NXevent_data should be "
+            "a subset of the values in the detector_number dataset on the "
+            "associated NXdetector.",
+        )
+
+    def applies_to(self, node: Dataset | Group) -> bool:
+        return (
+            isinstance(node, Group)
+            and node.attrs.get('NX_class') == 'NXevent_data'
+            and 'event_id' in node.children
+            and 'detector_number' in node.parent.children
+        )
+
+    def validate(self, node: Dataset | Group) -> Violation | None:
+        if not np.isin(
+            node.children['event_id'].value,
+            node.parent.children['detector_number'].value,
+        ).all():
+            return Violation(node.name)
+
+
 physical_components = [
     "NXaperture",
     "NXattenuator",
@@ -374,6 +399,7 @@ def base_validators(*, has_scipp=True):
         units_invalid(),
         NXlog_has_value(),
         detector_numbers_unique_in_all_detectors(),
+        event_id_subset_of_detector_number(),
     ]
     if has_scipp:
         validators += [

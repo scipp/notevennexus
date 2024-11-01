@@ -556,3 +556,116 @@ def test_event_id_not_in_detector_number():
         )
         is not None
     )
+
+
+def test_NXdetector_pixel_offsets_are_unambiguous_1d_ids_1d_offset() -> None:
+    det = chexus.Group(name="detector1", attrs={"NX_class": "NXdetector"})
+    det.children = {
+        'detector_number': chexus.Dataset(
+            name="detector_number", value=[1, 2, 3], shape=(3,), dtype=int, parent=det
+        ),
+        'x_pixel_offset': chexus.Dataset(
+            name="x_pixel_offset", value=[1, 2, 3], shape=(3,), dtype=int, parent=det
+        ),
+    }
+    assert chexus.validators.NXdetector_pixel_offsets_are_unambiguous().applies_to(det)
+    assert (
+        chexus.validators.NXdetector_pixel_offsets_are_unambiguous().validate(det)
+        is None
+    )
+
+
+def test_NXdetector_pixel_offsets_are_unambiguous_2d_ids_2d_offsets() -> None:
+    det = chexus.Group(name="detector1", attrs={"NX_class": "NXdetector"})
+    det.children = {
+        'detector_number': chexus.Dataset(
+            name="detector_number",
+            value=[[1, 2], [3, 4]],
+            shape=(2, 2),
+            dtype=int,
+            parent=det,
+        ),
+        'x_pixel_offset': chexus.Dataset(
+            name="x_pixel_offset",
+            value=[[1, 2], [3, 4]],
+            shape=(2, 2),
+            dtype=int,
+            parent=det,
+        ),
+    }
+    assert chexus.validators.NXdetector_pixel_offsets_are_unambiguous().applies_to(det)
+    assert (
+        chexus.validators.NXdetector_pixel_offsets_are_unambiguous().validate(det)
+        is None
+    )
+
+
+def test_NXdetector_pixel_offsets_are_unambiguous_2d_shape_mismatch() -> None:
+    det = chexus.Group(name="detector1", attrs={"NX_class": "NXdetector"})
+    det.children = {
+        'detector_number': chexus.Dataset(
+            name="detector_number",
+            value=[[1, 2, 3], [4, 5, 6]],
+            shape=(2, 3),
+            dtype=int,
+            parent=det,
+        ),
+        'x_pixel_offset': chexus.Dataset(
+            name="x_pixel_offset",
+            value=[[1, 2], [3, 4], [5, 6]],
+            shape=(3, 2),
+            dtype=int,
+            parent=det,
+        ),
+    }
+    assert chexus.validators.NXdetector_pixel_offsets_are_unambiguous().applies_to(det)
+    assert (
+        chexus.validators.NXdetector_pixel_offsets_are_unambiguous().validate(det)
+        is not None
+    )
+
+
+def test_NXdetector_pixel_offsets_are_unambiguous_2d_ids_missing_indices() -> None:
+    det = chexus.Group(name="detector1", attrs={"NX_class": "NXdetector"})
+    det.children = {
+        'detector_number': chexus.Dataset(
+            name="detector_number",
+            value=[[1, 2], [3, 4]],
+            shape=(2, 2),
+            dtype=int,
+            parent=det,
+        ),
+        'x_pixel_offset': chexus.Dataset(
+            name="x_pixel_offset", value=[1, 2], shape=(2,), dtype=int, parent=det
+        ),
+    }
+    assert chexus.validators.NXdetector_pixel_offsets_are_unambiguous().applies_to(det)
+    assert (
+        chexus.validators.NXdetector_pixel_offsets_are_unambiguous().validate(det)
+        is not None
+    )
+
+
+def test_NXdetector_pixel_offsets_are_unambiguous_2d_ids_1d_offsets_with_indices() -> (
+    None
+):
+    det = chexus.Group(
+        name="detector1", attrs={"NX_class": "NXdetector", "x_pixel_offset_indices": 1}
+    )
+    det.children = {
+        'detector_number': chexus.Dataset(
+            name="detector_number",
+            value=[[1, 2], [3, 4]],
+            shape=(2, 2),
+            dtype=int,
+            parent=det,
+        ),
+        'x_pixel_offset': chexus.Dataset(
+            name="x_pixel_offset", value=[1, 2], shape=(2,), dtype=int, parent=det
+        ),
+    }
+    assert chexus.validators.NXdetector_pixel_offsets_are_unambiguous().applies_to(det)
+    assert (
+        chexus.validators.NXdetector_pixel_offsets_are_unambiguous().validate(det)
+        is None
+    )

@@ -314,6 +314,38 @@ class event_id_subset_of_detector_number(Validator):
             return Violation(node.name)
 
 
+class NXdetector_pixel_offsets_are_unambiguous(Validator):
+    def __init__(self) -> None:
+        super().__init__(
+            "Shape of pixel offsets does not correspond to detector_number",
+            "If detector_number is multi-dimensional, so should the pixel_offsets, "
+            "else group attributes AXISNAME_indices (see NXdata) should indicate the "
+            "correspondence between detector_number and pixel_offsets.",
+        )
+
+    def applies_to(self, node: Dataset | Group) -> bool:
+        return (
+            isinstance(node, Group)
+            and node.attrs.get('NX_class') == 'NXdetector'
+            and 'detector_number' in node.children
+            and 'x_pixel_offset' in node.children
+        )
+
+    def validate(self, node: Dataset | Group) -> Violation | None:
+        shape = node.children['detector_number'].shape
+        for dim in 'xyz':
+            key = f'{dim}_pixel_offset'
+            if key not in node.children:
+                continue
+            pixel_shape = node.children[key].shape
+            if shape != pixel_shape and f'{key}_indices' not in node.attrs:
+                return Violation(
+                    node.name,
+                    f'{key} shape does not match detector_number and no {key}_indices '
+                    'attribute found',
+                )
+
+
 physical_components = [
     "NXaperture",
     "NXattenuator",
@@ -405,6 +437,7 @@ def base_validators(*, has_scipp=True):
         NXlog_has_value(),
         detector_numbers_unique_in_all_detectors(),
         event_id_subset_of_detector_number(),
+        NXdetector_pixel_offsets_are_unambiguous(),
     ]
     if has_scipp:
         validators += [

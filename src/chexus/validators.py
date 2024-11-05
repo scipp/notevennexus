@@ -244,21 +244,16 @@ class transformation_units_invalid(Validator):
         )
 
     def applies_to(self, node: Dataset | Group) -> bool:
-        return (
-            is_transformation(node)
-            and "transformation_type" in node.attrs
-            and (
-                isinstance(node, Dataset)
-                or isinstance(node, Group)
-                and 'value' in node.children
-            )
+        return is_transformation(node) and (
+            isinstance(node, Dataset)
+            or (isinstance(node, Group) and 'value' in node.children)
         )
 
     def validate(self, node: Dataset | Group) -> Violation | None:
         import scipp as sc
 
         unit = (node.children['value'] if isinstance(node, Group) else node).attrs.get(
-            'unit'
+            'units'
         )
         expected_unit = (
             "m" if node.attrs["transformation_type"] == "translation" else "rad"

@@ -335,7 +335,7 @@ def test_transformation_units_invalid(
                         dtype=float,
                         parent=None,
                         attrs={
-                            "unit": unit,
+                            "units": unit,
                         },
                     )
                 },
@@ -346,7 +346,7 @@ def test_transformation_units_invalid(
             shape=None,
             dtype=float,
         )
-        ds.attrs['unit'] = unit
+        ds.attrs['units'] = unit
         return ds
 
     for unit in good_units:

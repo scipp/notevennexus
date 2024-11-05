@@ -256,15 +256,10 @@ def test_transformation_offset_units_missing():
 
 
 @pytest.mark.parametrize(
-    ("transformation_type", "unit"),
-    [
-        ("rotation", "deg"),
-        ("rotation", "rad"),
-        ("translation", "m"),
-        ("translation", "mm"),
-    ],
+    ("unit"),
+    ["m", "mm"],
 )
-def test_transformation_offset_units_invalid_good(transformation_type, unit):
+def test_transformation_offset_units_invalid_good(unit):
     good = chexus.Dataset(
         name="x",
         value=1,
@@ -272,7 +267,7 @@ def test_transformation_offset_units_invalid_good(transformation_type, unit):
         dtype=float,
         parent=None,
         attrs={
-            "transformation_type": transformation_type,
+            "transformation_type": "translation",
             "vector": [1.0, 0.0, 0.0],
             "offset": 1.0,
             "offset_units": unit,
@@ -285,15 +280,10 @@ def test_transformation_offset_units_invalid_good(transformation_type, unit):
 
 
 @pytest.mark.parametrize(
-    ("transformation_type", "unit"),
-    [
-        ("rotation", "Hz"),
-        ("rotation", "m"),
-        ("translation", "K"),
-        ("translation", "rad"),
-    ],
+    ("unit"),
+    ["Hz", "rad"],
 )
-def test_transformation_offset_units_invalid_bad(transformation_type, unit):
+def test_transformation_offset_units_invalid_bad(unit):
     bad = chexus.Dataset(
         name="x",
         value=1,
@@ -301,7 +291,7 @@ def test_transformation_offset_units_invalid_bad(transformation_type, unit):
         dtype=float,
         parent=None,
         attrs={
-            "transformation_type": transformation_type,
+            "transformation_type": "translation",
             "vector": [1.0, 0.0, 0.0],
             "offset": 1.0,
             "offset_units": unit,
@@ -312,6 +302,65 @@ def test_transformation_offset_units_invalid_bad(transformation_type, unit):
         chexus.validators.transformation_offset_units_invalid().validate(bad),
         chexus.Violation,
     )
+
+
+@pytest.mark.parametrize(
+    ("transformation_type", "good_units", "bad_units"),
+    [
+        ("rotation", ("deg", "rad"), ("m", "")),
+        ("translation", ("m", "mm"), ("deg", "")),
+    ],
+)
+@pytest.mark.parametrize("is_log", [True, False])
+def test_transformation_units_invalid(
+    transformation_type, good_units, bad_units, is_log
+):
+    def create_transformation(transformation_type, unit, is_log):
+        common = {
+            "name": "x",
+            "parent": None,
+            "attrs": {
+                "transformation_type": transformation_type,
+                "vector": [1.0, 0.0, 0.0],
+            },
+        }
+        if is_log:
+            return chexus.Group(
+                **common,
+                children={
+                    'value': chexus.Dataset(
+                        name="value",
+                        value=[1.0, 2.0],
+                        shape=(2,),
+                        dtype=float,
+                        parent=None,
+                        attrs={
+                            "unit": unit,
+                        },
+                    )
+                },
+            )
+        ds = chexus.Dataset(
+            **common,
+            value=1.0,
+            shape=None,
+            dtype=float,
+        )
+        ds.attrs['unit'] = unit
+        return ds
+
+    for unit in good_units:
+        good = create_transformation(transformation_type, unit, is_log)
+        assert chexus.validators.transformation_units_invalid().applies_to(good)
+        assert chexus.validators.transformation_units_invalid().validate(good) is None
+
+    for unit in bad_units:
+        bad = create_transformation(transformation_type, unit, is_log)
+        assert chexus.validators.transformation_units_invalid().applies_to(bad)
+        assert isinstance(
+            chexus.validators.transformation_units_invalid().validate(bad),
+            chexus.Violation,
+        )
 
 
 @pytest.mark.parametrize("units", ["NX_LENGTH", "NX_DIMENSIONLESS", "hz", ["m"]])

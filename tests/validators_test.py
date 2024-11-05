@@ -255,6 +255,65 @@ def test_transformation_offset_units_missing():
     assert result.name == "x"
 
 
+@pytest.mark.parametrize(
+    ("transformation_type", "unit"),
+    [
+        ("rotation", "deg"),
+        ("rotation", "rad"),
+        ("translation", "m"),
+        ("translation", "mm"),
+    ],
+)
+def test_transformation_offset_units_invalid_good(transformation_type, unit):
+    good = chexus.Dataset(
+        name="x",
+        value=1,
+        shape=None,
+        dtype=float,
+        parent=None,
+        attrs={
+            "transformation_type": transformation_type,
+            "vector": [1.0, 0.0, 0.0],
+            "offset": 1.0,
+            "offset_units": unit,
+        },
+    )
+    assert chexus.validators.transformation_offset_units_invalid().applies_to(good)
+    assert (
+        chexus.validators.transformation_offset_units_invalid().validate(good) is None
+    )
+
+
+@pytest.mark.parametrize(
+    ("transformation_type", "unit"),
+    [
+        ("rotation", "Hz"),
+        ("rotation", "m"),
+        ("translation", "K"),
+        ("translation", "rad"),
+    ],
+)
+def test_transformation_offset_units_invalid_bad(transformation_type, unit):
+    bad = chexus.Dataset(
+        name="x",
+        value=1,
+        shape=None,
+        dtype=float,
+        parent=None,
+        attrs={
+            "transformation_type": transformation_type,
+            "vector": [1.0, 0.0, 0.0],
+            "offset": 1.0,
+            "offset_units": unit,
+        },
+    )
+    assert chexus.validators.transformation_offset_units_invalid().applies_to(bad)
+    assert isinstance(
+        chexus.validators.transformation_offset_units_invalid().validate(bad),
+        chexus.Violation,
+    )
+
+
 @pytest.mark.parametrize("units", ["NX_LENGTH", "NX_DIMENSIONLESS", "hz", ["m"]])
 def test_units_invalid(units: str):
     good = chexus.Dataset(

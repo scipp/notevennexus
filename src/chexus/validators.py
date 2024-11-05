@@ -211,6 +211,37 @@ class transformation_offset_units_missing(Validator):
             return Violation(node.name)
 
 
+class transformation_offset_units_invalid(Validator):
+    def __init__(self) -> None:
+        super().__init__(
+            "transformation_offset_units_invalid",
+            "Transformation offset_units attr. should have length unit if "
+            "transformation_type attr. is 'translation' and "
+            "rotation unit if transformation type is 'rotation'",
+        )
+
+    def applies_to(self, node: Dataset | Group) -> bool:
+        return (
+            isinstance(node, Dataset)
+            and is_transformation(node)
+            and "offset_units" in node.attrs
+        )
+
+    def validate(self, node: Dataset | Group) -> Violation | None:
+        import scipp as sc
+
+        if node.attrs["transformation_type"] == "translation":
+            try:
+                sc.scalar(1, unit=node.attrs["offset_units"]).to(unit="m")
+            except sc.UnitError:
+                return Violation(node.name)
+        if node.attrs["transformation_type"] == "rotation":
+            try:
+                sc.scalar(1, unit=node.attrs["offset_units"]).to(unit="rad")
+            except sc.UnitError:
+                return Violation(node.name)
+
+
 class transformation_depends_on_missing(Validator):
     def __init__(self) -> None:
         super().__init__(

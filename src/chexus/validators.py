@@ -200,11 +200,7 @@ class transformation_offset_units_missing(Validator):
         )
 
     def applies_to(self, node: Dataset | Group) -> bool:
-        return (
-            isinstance(node, Dataset)
-            and is_transformation(node)
-            and "offset" in node.attrs
-        )
+        return is_transformation(node) and "offset" in node.attrs
 
     def validate(self, node: Dataset | Group) -> Violation | None:
         if "offset_units" not in node.attrs:
@@ -219,11 +215,7 @@ class transformation_offset_units_invalid(Validator):
         )
 
     def applies_to(self, node: Dataset | Group) -> bool:
-        return (
-            isinstance(node, Dataset)
-            and is_transformation(node)
-            and "offset_units" in node.attrs
-        )
+        return is_transformation(node) and "offset_units" in node.attrs
 
     def validate(self, node: Dataset | Group) -> Violation | None:
         import scipp as sc

@@ -200,14 +200,59 @@ class transformation_offset_units_missing(Validator):
         )
 
     def applies_to(self, node: Dataset | Group) -> bool:
-        return (
-            isinstance(node, Dataset)
-            and is_transformation(node)
-            and "offset" in node.attrs
-        )
+        return is_transformation(node) and "offset" in node.attrs
 
     def validate(self, node: Dataset | Group) -> Violation | None:
         if "offset_units" not in node.attrs:
+            return Violation(node.name)
+
+
+class transformation_offset_units_invalid(Validator):
+    def __init__(self) -> None:
+        super().__init__(
+            "transformation_offset_units_invalid",
+            "Transformation offset_units attr. should be a length unit",
+        )
+
+    def applies_to(self, node: Dataset | Group) -> bool:
+        return is_transformation(node) and "offset_units" in node.attrs
+
+    def validate(self, node: Dataset | Group) -> Violation | None:
+        import scipp as sc
+
+        try:
+            sc.scalar(1, unit=node.attrs["offset_units"]).to(unit="m")
+        except sc.UnitError:
+            return Violation(node.name)
+
+
+class transformation_units_invalid(Validator):
+    def __init__(self) -> None:
+        super().__init__(
+            "transformation_value_units_invalid",
+            "Transformation value units should be a length unit "
+            "if transformation type is translation and "
+            "a rotation unit if transformation type is rotation",
+        )
+
+    def applies_to(self, node: Dataset | Group) -> bool:
+        return is_transformation(node) and (
+            isinstance(node, Dataset)
+            or (isinstance(node, Group) and 'value' in node.children)
+        )
+
+    def validate(self, node: Dataset | Group) -> Violation | None:
+        import scipp as sc
+
+        unit = (node.children['value'] if isinstance(node, Group) else node).attrs.get(
+            'units'
+        )
+        expected_unit = (
+            "m" if node.attrs["transformation_type"] == "translation" else "rad"
+        )
+        try:
+            sc.scalar(1, unit=unit).to(unit=expected_unit)
+        except sc.UnitError:
             return Violation(node.name)
 
 
@@ -443,5 +488,7 @@ def base_validators(*, has_scipp=True):
         validators += [
             chopper_frequency_units_invalid(),
             dataset_units_check(),
+            transformation_offset_units_invalid(),
+            transformation_units_invalid(),
         ]
     return validators

@@ -589,7 +589,9 @@ def test_NXlog_nested_top_dead_center_has_no_value():
     assert result.name == "chopper/top_dead_center"
 
 
-@pytest.mark.parametrize('value', [(1, 2, 3), np.array([1, 2, 3]), [[0, 1], [2, 3]]])
+@pytest.mark.parametrize(
+    'value', [[1, 2, 3], np.array([1, 2, 3]), np.array([[0, 1], [2, 3]])]
+)
 def test_duplicate_detector_number(value):
     det = chexus.Group(name="detector1", attrs={"NX_class": "NXdetector"})
     det.children = {
@@ -601,18 +603,12 @@ def test_duplicate_detector_number(value):
             parent=det,
         )
     }
-    det2 = chexus.Group(name="detector2", attrs={"NX_class": "NXdetector"})
-    det2.children = {
-        'detector_number': chexus.Dataset(
-            name="detector_number", value=[4, 5, 6], shape=(3,), dtype=int, parent=det2
-        )
-    }
-    assert chexus.validators.detector_numbers_unique_in_all_detectors().applies_to(det)
-    validator = chexus.validators.detector_numbers_unique_in_all_detectors()
+    assert chexus.validators.detector_numbers_unique_in_detector().applies_to(det)
+    validator = chexus.validators.detector_numbers_unique_in_detector()
     assert validator.validate(det) is None
-    assert validator.validate(det2) is None
-    # Second time the same detector numbers are seen, we expect a violation
-    assert validator.validate(det) is not None
+    # Make one entry duplicate
+    det.children['detector_number'].value[-1] = 1
+    assert isinstance(validator.validate(det), chexus.Violation)
 
 
 def test_event_id_not_in_detector_number():
